@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { getProducts, type Product } from "@/lib/products";
+import { DataService, type Product } from "@/lib/data-service";
 
 interface CartItem extends Product {
   quantity: number;
@@ -14,6 +14,7 @@ interface CartItem extends Product {
 
 const Order = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     phone: "",
@@ -33,6 +34,17 @@ const Order = () => {
   useEffect(() => {
     localStorage.setItem("sunny_cart", JSON.stringify(cart));
   }, [cart]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setProducts(await DataService.getProducts());
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    loadProducts();
+  }, []);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -340,55 +352,35 @@ const Order = () => {
         {/* Add Products Section */}
         <div className="glass rounded-[var(--radius)] p-6 space-y-4">
           <h2 className="font-semibold text-lg text-foreground">เพิ่มสินค้า</h2>
-          <ProductGrid onAddToCart={addToCart} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="glass rounded-[var(--radius)] p-4 space-y-3 hover:shadow-warm transition-all duration-300"
+              >
+                <div className="w-full h-32 rounded-xl bg-muted overflow-hidden">
+                  {product.image ? (
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
+                      ไม่มีรูป
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    ฿{product.retailPrice} | ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})
+                  </p>
+                </div>
+                <Button onClick={() => addToCart(product)} className="w-full gradient-warm text-primary-foreground">
+                  เพิ่มลงตะกร้า
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// Simple ProductGrid component for order page
-const ProductGrid = ({ onAddToCart }: { onAddToCart: (product: Product) => void }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      const data = await getProducts();
-      setProducts(data);
-    };
-    loadProducts();
-  }, []);
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {products.map((product) => (
-        <div
-          key={product.id}
-          className="glass rounded-[var(--radius)] p-4 space-y-3 hover:shadow-warm transition-all duration-300"
-        >
-          <div className="w-full h-32 rounded-xl bg-muted overflow-hidden">
-            {product.image_url ? (
-              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
-                ไม่มีรูป
-              </div>
-            )}
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
-            <p className="text-sm text-muted-foreground">
-              ฿{product.retail_price} | ฿{product.wholesale_price} (ขั้นต่ำ {product.min_wholesale_qty})
-            </p>
-          </div>
-          <Button
-            onClick={() => onAddToCart(product)}
-            className="w-full gradient-warm text-primary-foreground"
-          >
-            เพิ่มลงตะกร้า
-          </Button>
-        </div>
-      ))}
     </div>
   );
 };

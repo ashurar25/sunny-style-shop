@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { getProducts, addProduct, deleteProduct, getCategories, addCategory, deleteCategory, type Product } from "@/lib/products";
+import { useState, useEffect, useRef, type ChangeEvent } from "react";
+import { DataService, type Product } from "@/lib/data-service";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2, ImagePlus, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ const Admin = () => {
   const [showForm, setShowForm] = useState(false);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -33,8 +34,16 @@ const Admin = () => {
 
   useEffect(() => {
     setAuthed(localStorage.getItem(ADMIN_AUTH_KEY) === "1");
-    setProducts(getProducts());
-    setCategories(getCategories());
+    const load = async () => {
+      try {
+        const [p, c] = await Promise.all([DataService.getProducts(), DataService.getCategories()]);
+        setProducts(p);
+        setCategories(c);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    load();
   }, []);
 
   const handleLogin = () => {
@@ -58,7 +67,7 @@ const Admin = () => {
     toast.success("ออกจากระบบแล้ว");
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
@@ -68,44 +77,94 @@ const Admin = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleAdd = () => {
+  const handleSave = async () => {
     if (!form.name || !form.retailPrice || !form.wholesalePrice || !form.minWholesaleQty) {
       toast.error("กรุณากรอกข้อมูลให้ครบ");
       return;
     }
-    addProduct({
-      name: form.name,
-      description: form.description,
-      image: form.image,
-      retailPrice: Number(form.retailPrice),
-      wholesalePrice: Number(form.wholesalePrice),
-      minWholesaleQty: Number(form.minWholesaleQty),
-      category: form.category || undefined,
-    });
-    setProducts(getProducts());
-    setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", image: "", category: "" });
-    setShowForm(false);
-    toast.success("เพิ่มสินค้าแล้ว");
+    try {
+      if (editingId) {
+        await DataService.updateProduct(editingId, {
+          name: form.name,
+          description: form.description,
+          image: form.image,
+          retailPrice: Number(form.retailPrice),
+          wholesalePrice: Number(form.wholesalePrice),
+          minWholesaleQty: Number(form.minWholesaleQty),
+          category: form.category || undefined,
+        });
+        toast.success("แก้ไขสินค้าแล้ว");
+      } else {
+        await DataService.addProduct({
+          name: form.name,
+          description: form.description,
+          image: form.image,
+          retailPrice: Number(form.retailPrice),
+          wholesalePrice: Number(form.wholesalePrice),
+          minWholesaleQty: Number(form.minWholesaleQty),
+          category: form.category || undefined,
+        });
+        toast.success("เพิ่มสินค้าแล้ว");
+      }
+      const [p, c] = await Promise.all([DataService.getProducts(), DataService.getCategories()]);
+      setProducts(p);
+      setCategories(c);
+      setEditingId(null);
+      setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", image: "", category: "" });
+      setShowForm(false);
+    } catch (e) {
+      console.error(e);
+      toast.error("บันทึกไม่สำเร็จ");
+    }
   };
 
-  const handleDelete = (id: string) => {
-    deleteProduct(id);
-    setProducts(getProducts());
-    toast.success("ลบสินค้าแล้ว");
+  const handleDelete = async (id: string) => {
+    try {
+      await DataService.deleteProduct(id);
+      setProducts(await DataService.getProducts());
+      toast.success("ลบสินค้าแล้ว");
+    } catch (e) {
+      console.error(e);
+      toast.error("ลบไม่สำเร็จ");
+    }
   };
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!newCategory.trim()) return;
-    const updated = addCategory(newCategory.trim());
-    setCategories(updated);
-    setNewCategory("");
-    toast.success("เพิ่มหมวดหมู่แล้ว");
+    try {
+      const updated = await DataService.addCategory(newCategory.trim());
+      setCategories(updated);
+      setNewCategory("");
+      toast.success("เพิ่มหมวดหมู่แล้ว");
+    } catch (e) {
+      console.error(e);
+      toast.error("เพิ่มหมวดหมู่ไม่สำเร็จ");
+    }
   };
 
-  const handleDeleteCategory = (name: string) => {
-    const updated = deleteCategory(name);
-    setCategories(updated);
-    toast.success("ลบหมวดหมู่แล้ว");
+  const handleDeleteCategory = async (name: string) => {
+    try {
+      const updated = await DataService.deleteCategory(name);
+      setCategories(updated);
+      toast.success("ลบหมวดหมู่แล้ว");
+    } catch (e) {
+      console.error(e);
+      toast.error("ลบหมวดหมู่ไม่สำเร็จ");
+    }
+  };
+
+  const startEdit = (product: Product) => {
+    setEditingId(product.id);
+    setForm({
+      name: product.name,
+      description: product.description || "",
+      retailPrice: String(product.retailPrice),
+      wholesalePrice: String(product.wholesalePrice),
+      minWholesaleQty: String(product.minWholesaleQty),
+      image: product.image || "",
+      category: product.category || "",
+    });
+    setShowForm(true);
   };
 
   if (!authed) {
@@ -221,7 +280,7 @@ const Admin = () => {
         {/* Add Form */}
         {showForm && (
           <div className="glass rounded-[var(--radius)] p-6 space-y-4 animate-fade-up">
-            <h2 className="font-semibold text-lg text-foreground">เพิ่มสินค้าใหม่</h2>
+            <h2 className="font-semibold text-lg text-foreground">{editingId ? "แก้ไขสินค้า" : "เพิ่มสินค้าใหม่"}</h2>
 
             {/* Image upload */}
             <div
@@ -293,10 +352,18 @@ const Admin = () => {
               />
             </div>
             <div className="flex gap-3">
-              <Button onClick={handleAdd} className="gradient-warm text-primary-foreground flex-1">
+              <Button onClick={handleSave} className="gradient-warm text-primary-foreground flex-1">
                 บันทึก
               </Button>
-              <Button variant="outline" onClick={() => setShowForm(false)} className="flex-1">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingId(null);
+                  setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", image: "", category: "" });
+                }}
+                className="flex-1"
+              >
                 ยกเลิก
               </Button>
             </div>
@@ -332,6 +399,9 @@ const Admin = () => {
                   ปลีก ฿{product.retailPrice} | ส่ง ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})
                 </p>
               </div>
+              <Button variant="outline" onClick={() => startEdit(product)} className="rounded-xl shrink-0">
+                แก้ไข
+              </Button>
               <button
                 onClick={() => handleDelete(product.id)}
                 className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors shrink-0"
