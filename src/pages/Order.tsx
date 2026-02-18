@@ -33,10 +33,9 @@ const Order = () => {
         const parsed = JSON.parse(savedCart);
         const migrated = Array.isArray(parsed)
           ? parsed.map((item: any) => {
-              if (item && !item.image && item.image_url) {
-                return { ...item, image: item.image_url };
-              }
-              return item;
+              if (!item || typeof item !== "object") return item;
+              const image = item.image ?? item.imageUrl ?? item.image_url ?? "";
+              return { ...item, image };
             })
           : [];
         setCart(migrated);
@@ -53,7 +52,18 @@ const Order = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        setProducts(await DataService.getProducts());
+        const loaded = await DataService.getProducts();
+        setProducts(loaded);
+
+        // เติมรูปสินค้าในตะกร้า (กรณีตะกร้าเก่าไม่มีรูป หรือรูปเป็นค่าว่าง)
+        setCart((prev) =>
+          prev.map((item) => {
+            if (item?.image) return item;
+            const p = loaded.find((x) => x.id === item.id);
+            if (p?.image) return { ...item, image: p.image };
+            return item;
+          })
+        );
       } catch (e) {
         console.error(e);
       }
