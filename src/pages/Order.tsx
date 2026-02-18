@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Minus, Trash2, Facebook, Printer, Image } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Trash2, Facebook, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -108,19 +108,7 @@ const Order = () => {
     return summary;
   };
 
-  const handlePrint = () => {
-    if (cart.length === 0) {
-      toast.error("กรุณาเลือกสินค้าก่อน");
-      return;
-    }
-    if (!customerInfo.name || !customerInfo.phone) {
-      toast.error("กรุณากรอกชื่อและเบอร์โทร");
-      return;
-    }
-    window.print();
-  };
-
-  const handleCaptureReceipt = () => {
+  const handlePrintReceipt = () => {
     if (cart.length === 0) {
       toast.error("กรุณาเลือกสินค้าก่อน");
       return;
@@ -187,7 +175,7 @@ const Order = () => {
     // แปลงเป็นรูป
     const imageUrl = canvas.toDataURL('image/png');
     setReceiptImage(imageUrl);
-    toast.success('จับภาพใบเสร็จแล้ว');
+    toast.success('สร้างใบเสร็จแล้ว');
   };
 
   const handleSendReceiptToFacebook = () => {
@@ -236,14 +224,6 @@ const Order = () => {
             </Link>
             <h1 className="text-xl font-bold text-foreground">สั่งซื้อสินค้า</h1>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handlePrint} className="rounded-full">
-              <Printer className="w-4 h-4 mr-1" /> ปริ้น
-            </Button>
-            <Button variant="outline" onClick={handleCaptureReceipt} className="rounded-full">
-              <Image className="w-4 h-4 mr-1" /> จับภาพใบเสร็จ
-            </Button>
-          </div>
         </div>
       </header>
 
@@ -277,99 +257,9 @@ const Order = () => {
           />
         </div>
 
-        {/* Cart */}
-        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
-          <h2 className="font-semibold text-lg text-foreground">ตะกร้าสินค้า</h2>
-          {cart.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">ยังไม่มีสินค้าในตะกร้า</p>
-          ) : (
-            <div className="space-y-3">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 p-3 bg-muted/30 rounded-xl"
-                >
-                  <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-                    {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
-                        ไม่มีรูป
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-foreground truncate">{item.name}</h3>
-                      {item.category && (
-                        <Badge variant="secondary" className="text-xs shrink-0">
-                          {item.category}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      ฿{item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice}/ชิ้น
-                      {item.quantity < item.minWholesaleQty && (
-                        <span className="text-xs text-primary ml-1">
-                          (ขั้นต่ำ {item.minWholesaleQty} ชิ้น ราคาส่ง)
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(item.id, -1)}
-                      className="w-8 h-8 p-0"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                    <span className="w-8 text-center font-medium">{item.quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(item.id, 1)}
-                      className="w-8 h-8 p-0"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeFromCart(item.id)}
-                      className="w-8 h-8 p-0 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Receipt Preview */}
-        {receiptImage && (
-          <div className="glass rounded-[var(--radius)] p-6 space-y-4">
-            <h2 className="font-semibold text-lg text-foreground">ตัวอย่างใบเสร็จ</h2>
-            <div className="bg-white p-4 rounded-lg">
-              <img src={receiptImage} alt="ใบเสร็จ" className="w-full" />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setReceiptImage(null)} className="flex-1">
-                ปิดตัวอย่าง
-              </Button>
-              <Button onClick={handleSendReceiptToFacebook} className="gradient-warm text-primary-foreground flex-1">
-                <Facebook className="w-4 h-4 mr-1" /> ส่งรูปไป Facebook
-              </Button>
-            </div>
-          </div>
-        )}
-
         {/* Add Products Section */}
         <div className="glass rounded-[var(--radius)] p-6 space-y-4">
-          <h2 className="font-semibold text-lg text-foreground">เพิ่มสินค้า</h2>
+          <h2 className="font-semibold text-lg text-foreground">เลือกสินค้า</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((product) => (
               <div
@@ -397,6 +287,105 @@ const Order = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Cart */}
+        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="font-semibold text-lg text-foreground">ตะกร้าสินค้า</h2>
+            <div className="text-sm text-muted-foreground">รวม ฿{getTotal()}</div>
+          </div>
+          {cart.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">ยังไม่มีสินค้าในตะกร้า</p>
+          ) : (
+            <div className="space-y-3">
+              {cart.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 p-3 bg-muted/30 rounded-xl">
+                  <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
+                        ไม่มีรูป
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground truncate">{item.name}</h3>
+                      {item.category && (
+                        <Badge variant="secondary" className="text-xs shrink-0">
+                          {item.category}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      ฿{item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice}/ชิ้น
+                      {item.quantity < item.minWholesaleQty && (
+                        <span className="text-xs text-primary ml-1">(ขั้นต่ำ {item.minWholesaleQty} ชิ้น ราคาส่ง)</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 p-0">
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <span className="w-8 text-center font-medium">{item.quantity}</span>
+                    <Button variant="outline" size="sm" onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 p-0">
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeFromCart(item.id)}
+                      className="w-8 h-8 p-0 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Receipt Actions */}
+        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+          <h2 className="font-semibold text-lg text-foreground">ใบเสร็จ</h2>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button onClick={handlePrintReceipt} className="gradient-warm text-primary-foreground flex-1">
+              <Image className="w-4 h-4 mr-1" /> พิมพ์ใบเสร็จ
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!receiptImage) {
+                  toast.error("กรุณาพิมพ์ใบเสร็จก่อน");
+                  return;
+                }
+                window.open(receiptImage, "_blank", "noopener,noreferrer");
+              }}
+              className="flex-1"
+            >
+              บันทึกใบเสร็จ
+            </Button>
+          </div>
+
+          {receiptImage && (
+            <div className="space-y-4">
+              <div className="bg-white p-4 rounded-lg">
+                <img src={receiptImage} alt="ใบเสร็จ" className="w-full" />
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setReceiptImage(null)} className="flex-1">
+                  ลบใบเสร็จ
+                </Button>
+                <Button onClick={handleSendReceiptToFacebook} className="gradient-warm text-primary-foreground flex-1">
+                  <Facebook className="w-4 h-4 mr-1" /> ส่งรูปไป Facebook
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
