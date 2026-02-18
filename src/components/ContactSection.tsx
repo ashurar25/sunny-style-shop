@@ -14,7 +14,7 @@ const contacts = [
     icon: MessageCircle,
     label: "Line",
     value: "@kenginol.ar",
-    href: "https://line.me/ti/p/@kenginol.ar",
+    href: "https://line.me/R/ti/p/%40kenginol.ar",
     gradient: "from-emerald-500/15 to-emerald-500/5",
     iconColor: "text-emerald-600",
   },
