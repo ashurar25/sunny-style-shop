@@ -12,9 +12,9 @@ const contacts = [
   },
   {
     icon: MessageCircle,
-    label: "Email",
-    value: "kenginol.ar@gmail.com",
-    href: "mailto:kenginol.ar@gmail.com",
+    label: "Line",
+    value: "เพิ่มเพื่อนในไลน์",
+    href: "https://line.me/ti/p/o6v8FE_0QN",
     gradient: "from-emerald-500/15 to-emerald-500/5",
     iconColor: "text-emerald-600",
   },
