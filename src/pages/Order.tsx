@@ -160,7 +160,7 @@ const Order = () => {
       const total = price * item.quantity;
       
       ctx.fillText(`${item.name}`, 40, y);
-      ctx.fillText(`x${item.item}`, 250, y);
+      ctx.fillText(`x${item.quantity}`, 250, y);
       ctx.fillText(`฿${total}`, 320, y);
       y += 20;
     });
@@ -352,7 +352,11 @@ const ProductGrid = ({ onAddToCart }: { onAddToCart: (product: Product) => void 
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    getProducts().then(setProducts);
+    const loadProducts = async () => {
+      const data = await getProducts();
+      setProducts(data);
+    };
+    loadProducts();
   }, []);
 
   return (
