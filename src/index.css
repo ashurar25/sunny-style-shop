@@ -48,10 +48,12 @@
     /* Custom tokens */
     --glass-bg: 35 60% 98% / 0.7;
     --glass-border: 35 40% 88% / 0.5;
-    --gradient-warm: linear-gradient(135deg, hsl(28 95% 55%), hsl(42 100% 60%));
-    --gradient-hero: linear-gradient(180deg, hsl(42 100% 92%), hsl(35 100% 97%));
-    --shadow-warm: 0 8px 32px -8px hsl(28 95% 55% / 0.2);
-    --shadow-card: 0 4px 24px -4px hsl(25 30% 15% / 0.08);
+    --gradient-warm: linear-gradient(135deg, hsl(28 95% 55%), hsl(38 100% 58%));
+    --gradient-hero: linear-gradient(180deg, hsl(42 100% 94%), hsl(35 80% 97%) 60%, hsl(28 40% 96%));
+    --gradient-card: linear-gradient(145deg, hsl(35 60% 98%), hsl(42 80% 97%));
+    --shadow-warm: 0 8px 32px -8px hsl(28 95% 55% / 0.25);
+    --shadow-card: 0 4px 24px -4px hsl(25 30% 15% / 0.06);
+    --shadow-card-hover: 0 12px 40px -8px hsl(28 95% 55% / 0.18);
   }
 
   .dark {
@@ -98,8 +100,8 @@
 @layer utilities {
   .glass {
     background: hsl(var(--glass-bg));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid hsl(var(--glass-border));
   }
   .gradient-warm {
@@ -108,10 +110,36 @@
   .gradient-hero {
     background: var(--gradient-hero);
   }
+  .gradient-card {
+    background: var(--gradient-card);
+  }
   .shadow-warm {
     box-shadow: var(--shadow-warm);
   }
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
+  .shadow-card-hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(35 30% 95%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(28 60% 75%);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(28 80% 60%);
 }
