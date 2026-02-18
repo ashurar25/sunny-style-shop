@@ -1,12 +1,29 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Hero from "@/components/Hero";
+import ProductGrid from "@/components/ProductGrid";
+import ContactSection from "@/components/ContactSection";
+import { Link } from "react-router-dom";
+import { Settings } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Hero />
+      <ProductGrid />
+      <ContactSection />
+
+      {/* Footer */}
+      <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border">
+        <p>© 2025 กรุ้งกริ้ง ทอดกรอบ — อาหารสด แปรรูป</p>
+      </footer>
+
+      {/* Admin FAB */}
+      <Link
+        to="/admin"
+        className="fixed bottom-6 right-6 w-14 h-14 gradient-warm rounded-full flex items-center justify-center shadow-warm hover:scale-110 transition-transform z-50"
+        title="แอดมิน"
+      >
+        <Settings className="w-6 h-6 text-primary-foreground" />
+      </Link>
     </div>
   );
 };
