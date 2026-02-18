@@ -67,7 +67,7 @@ const Hero = () => {
           </span>
         </h1>
         <p className="text-base md:text-lg text-muted-foreground font-normal max-w-md mx-auto leading-relaxed">
-          อาหารสด • แปรรูป | อร่อยทุกคำ สดใหม่ทุกวัน
+          อาหารสด • แปรรูป • แช่แข็ง| อร่อยทุกคำ สดใหม่ทุกวัน
         </p>
       </motion.div>
 
