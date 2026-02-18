@@ -2,13 +2,34 @@ import { motion } from "framer-motion";
 import type { Product } from "@/lib/products";
 import { Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
   index: number;
+  enableAddToCart?: boolean;
 }
 
-const ProductCard = ({ product, index }: ProductCardProps) => {
+const ProductCard = ({ product, index, enableAddToCart = false }: ProductCardProps) => {
+  const handleAddToCart = () => {
+    try {
+      const raw = localStorage.getItem("sunny_cart");
+      const cart: Array<Product & { quantity: number }> = raw ? JSON.parse(raw) : [];
+      const existing = cart.find((i) => i.id === product.id);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+      localStorage.setItem("sunny_cart", JSON.stringify(cart));
+      toast.success("เพิ่มลงตะกร้าแล้ว");
+    } catch (e) {
+      console.error(e);
+      toast.error("เพิ่มลงตะกร้าไม่สำเร็จ");
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -56,6 +77,12 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
             <span className="text-lg font-bold text-accent-foreground">฿{product.wholesalePrice}</span>
           </div>
         </div>
+
+        {enableAddToCart && (
+          <Button onClick={handleAddToCart} className="w-full gradient-warm text-primary-foreground">
+            เพิ่มลงตะกร้า
+          </Button>
+        )}
       </div>
     </motion.div>
   );
