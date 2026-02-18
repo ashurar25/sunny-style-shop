@@ -196,12 +196,33 @@ const Order = () => {
       return;
     }
 
+    const popup = window.open("about:blank", "_blank", "noopener,noreferrer");
+    if (!popup) {
+      toast.error("เบราว์เซอร์บล็อกหน้าต่างใหม่ กรุณาอนุญาต Pop-up แล้วลองอีกครั้ง");
+      return;
+    }
+
     const summary = generateOrderSummary();
     const message = `📸 ใบเสร็จการสั่งซื้อ\n\n${summary}\n\n🖼️ รูปใบเสร็จ:`;
     const encoded = encodeURIComponent(message);
     const fbUrl = `https://www.facebook.com/Kenginol.ar/messages/?text=${encoded}`;
-    window.open(fbUrl, '_blank');
-    toast.success('เปิดหน้าส่งรูปใบเสร็จไป Facebook แล้ว');
+
+    try {
+      popup.location.href = fbUrl;
+      toast.success("เปิดหน้า Facebook แล้ว");
+    } catch (e) {
+      console.error(e);
+      popup.close();
+      toast.error("เปิดหน้า Facebook ไม่สำเร็จ");
+    }
+
+    // Best-effort: copy the message so user can paste if FB doesn't prefill.
+    void navigator.clipboard
+      ?.writeText(message)
+      .then(() => toast.success("คัดลอกข้อความใบเสร็จแล้ว (วางในแชทได้เลย)"))
+      .catch(() => {
+        // ignore
+      });
   };
 
   return (
