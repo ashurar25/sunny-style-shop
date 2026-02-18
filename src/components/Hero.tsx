@@ -37,15 +37,18 @@ const Hero = () => {
         initial={{ opacity: 0, scale: 0.6, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="relative"
+        whileHover={{ scale: 1.02, rotate: 0.5 }}
+        className="relative will-change-transform"
       >
         {/* Glow ring */}
-        <div className="absolute -inset-4 rounded-[3rem] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/15 blur-2xl" />
+        <div className="absolute -inset-6 rounded-[3.25rem] bg-gradient-to-br from-primary/25 via-secondary/12 to-accent/18 blur-2xl" />
         
-        <div className="relative w-52 h-52 md:w-60 md:h-60 rounded-[2.5rem] gradient-card shadow-warm border border-border/40 flex items-center justify-center p-5 backdrop-blur-sm">
+        <div className="relative w-60 h-60 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-[2.75rem] gradient-card shadow-warm border border-border/40 flex items-center justify-center p-6 backdrop-blur-sm">
           <img
             src={logo}
             alt="กรุ้งกริ้ง ทอดกรอบ"
+            loading="eager"
+            decoding="async"
             className="w-full h-full object-contain drop-shadow-lg"
           />
         </div>
@@ -57,13 +60,13 @@ const Hero = () => {
         transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="text-center mt-8 space-y-3"
       >
-        <h1 className="text-4xl md:text-6xl font-extrabold text-foreground tracking-tight leading-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-foreground tracking-tight leading-tight">
           กรุ้งกริ้ง{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
             ทอดกรอบ
           </span>
         </h1>
-        <p className="text-base md:text-lg text-muted-foreground font-light max-w-md mx-auto leading-relaxed">
+        <p className="text-base md:text-lg text-muted-foreground font-normal max-w-md mx-auto leading-relaxed">
           อาหารสด • แปรรูป | อร่อยทุกคำ สดใหม่ทุกวัน
         </p>
       </motion.div>
