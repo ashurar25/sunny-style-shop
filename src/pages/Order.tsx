@@ -24,6 +24,8 @@ const Order = () => {
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const receiptLogoUrl = "/logo.png";
+
   useEffect(() => {
     const savedCart = localStorage.getItem("sunny_cart");
     if (savedCart) {
@@ -108,7 +110,7 @@ const Order = () => {
     return summary;
   };
 
-  const handlePrintReceipt = () => {
+  const handlePrintReceipt = async () => {
     if (cart.length === 0) {
       toast.error("กรุณาเลือกสินค้าก่อน");
       return;
@@ -119,28 +121,33 @@ const Order = () => {
     }
 
     // สร้างใบเสร็จ
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = 400;
-    canvas.height = 600;
+    const width = 400;
+    const baseHeight = 260;
+    const lineHeight = 20;
+    const listHeight = cart.length * lineHeight;
+    const footerHeight = 120;
+    canvas.width = width;
+    canvas.height = baseHeight + listHeight + footerHeight;
 
     // พื้นหลังขาว
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // หัวข้อความ
-    ctx.fillStyle = '#000000';
-    ctx.font = 'bold 20px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('ใบเสร็จ กรุ้งกริ้ง ทอดกรอบ', canvas.width / 2, 40);
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 20px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("ใบเสร็จ กรุ้งกริ้ง ทอดกรอบ", canvas.width / 2, 40);
 
-    ctx.font = '14px Arial';
-    ctx.fillText('--------------------------------', canvas.width / 2, 60);
+    ctx.font = "14px Arial";
+    ctx.fillText("--------------------------------", canvas.width / 2, 60);
 
     // ข้อมูลลูกค้า
-    ctx.textAlign = 'left';
+    ctx.textAlign = "left";
     ctx.fillText(`ชื่อ: ${customerInfo.name}`, 40, 90);
     ctx.fillText(`เบอร์โทร: ${customerInfo.phone}`, 40, 110);
     if (customerInfo.address) {
@@ -150,11 +157,11 @@ const Order = () => {
       ctx.fillText(`หมายเหตุ: ${customerInfo.note}`, 40, 150);
     }
 
-    ctx.fillText('--------------------------------', 40, 170);
+    ctx.fillText("--------------------------------", 40, 170);
 
     // รายการสินค้า
     let y = 200;
-    ctx.font = '12px Arial';
+    ctx.font = "12px Arial";
     cart.forEach((item) => {
       const price = item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice;
       const total = price * item.quantity;
@@ -165,17 +172,53 @@ const Order = () => {
       y += 20;
     });
 
-    ctx.fillText('--------------------------------', 40, y);
+    ctx.fillText("--------------------------------", 40, y);
     y += 20;
 
     // รวมเงิน
-    ctx.font = 'bold 16px Arial';
+    ctx.font = "bold 16px Arial";
     ctx.fillText(`รวมทั้งหมด: ฿${getTotal()}`, 40, y);
 
+    // โลโก้ด้านล่าง
+    try {
+      const logo = new window.Image();
+      logo.crossOrigin = "anonymous";
+      const logoLoaded = new Promise<void>((resolve, reject) => {
+        logo.onload = () => resolve();
+        logo.onerror = () => reject(new Error("Failed to load logo"));
+      });
+      logo.src = receiptLogoUrl;
+      await logoLoaded;
+
+      const logoMaxWidth = 110;
+      const scale = Math.min(1, logoMaxWidth / logo.width);
+      const logoW = Math.round(logo.width * scale);
+      const logoH = Math.round(logo.height * scale);
+      const logoY = Math.min(canvas.height - logoH - 18, y + 30);
+      const logoX = Math.round((canvas.width - logoW) / 2);
+      ctx.drawImage(logo, logoX, logoY, logoW, logoH);
+    } catch (e) {
+      console.error(e);
+    }
+
     // แปลงเป็นรูป
-    const imageUrl = canvas.toDataURL('image/png');
+    const imageUrl = canvas.toDataURL("image/png");
     setReceiptImage(imageUrl);
     toast.success('สร้างใบเสร็จแล้ว');
+  };
+
+  const handleDownloadReceipt = () => {
+    if (!receiptImage) {
+      toast.error("กรุณาพิมพ์ใบเสร็จก่อน");
+      return;
+    }
+
+    const a = document.createElement("a");
+    a.href = receiptImage;
+    a.download = `receipt-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   };
 
   const handleSendReceiptToFacebook = () => {
@@ -356,25 +399,19 @@ const Order = () => {
             <Button onClick={handlePrintReceipt} className="gradient-warm text-primary-foreground flex-1">
               <Image className="w-4 h-4 mr-1" /> พิมพ์ใบเสร็จ
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (!receiptImage) {
-                  toast.error("กรุณาพิมพ์ใบเสร็จก่อน");
-                  return;
-                }
-                window.open(receiptImage, "_blank", "noopener,noreferrer");
-              }}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={handleDownloadReceipt} className="flex-1">
               บันทึกใบเสร็จ
             </Button>
           </div>
 
           {receiptImage && (
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-lg">
-                <img src={receiptImage} alt="ใบเสร็จ" className="w-full" />
+              <div className="bg-white p-4 rounded-lg overflow-auto">
+                <img
+                  src={receiptImage}
+                  alt="ใบเสร็จ"
+                  className="w-full max-w-[360px] mx-auto rounded-md"
+                />
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setReceiptImage(null)} className="flex-1">
