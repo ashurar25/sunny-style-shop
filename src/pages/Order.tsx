@@ -12,6 +12,8 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+type StoredCartItem = { id: string; quantity: number };
+
 type OrderErrorBoundaryState = { hasError: boolean; message: string };
 
 class OrderErrorBoundary extends React.Component<React.PropsWithChildren, OrderErrorBoundaryState> {
@@ -62,27 +64,70 @@ const Order = () => {
   const receiptLogoUrl = "/logo.png";
   const cartFallbackImageUrl = "/placeholder.svg";
 
+  const CART_STORAGE_KEY_V2 = "sunny_cart_v2";
+  const CART_STORAGE_KEY_V1 = "sunny_cart";
+
   useEffect(() => {
-    const savedCart = localStorage.getItem("sunny_cart");
-    if (savedCart) {
+    const savedV2 = localStorage.getItem(CART_STORAGE_KEY_V2);
+    if (savedV2) {
       try {
-        const parsed = JSON.parse(savedCart);
-        const migrated = Array.isArray(parsed)
-          ? parsed.map((item: any) => {
-              if (!item || typeof item !== "object") return item;
-              const image = item.image ?? item.imageUrl ?? item.image_url ?? "";
-              return { ...item, image };
-            })
-          : [];
-        setCart(migrated);
+        const parsed = JSON.parse(savedV2);
+        const minimal: StoredCartItem[] = Array.isArray(parsed) ? parsed : [];
+        // Hydration happens after products load
+        setCart(minimal.map((x) => ({
+          id: x.id,
+          quantity: x.quantity,
+          name: "",
+          image: "",
+          retailPrice: 0,
+          wholesalePrice: 0,
+          minWholesaleQty: 0,
+        })) as unknown as CartItem[]);
+        return;
       } catch (e) {
         console.error(e);
       }
     }
+
+    // Migration from legacy V1 (may contain huge base64 images and exceed quota)
+    const savedV1 = localStorage.getItem(CART_STORAGE_KEY_V1);
+    if (!savedV1) return;
+    try {
+      const parsed = JSON.parse(savedV1);
+      const minimal: StoredCartItem[] = Array.isArray(parsed)
+        ? parsed
+            .filter((x: any) => x && typeof x === "object" && x.id)
+            .map((x: any) => ({ id: String(x.id), quantity: Number(x.quantity ?? 1) }))
+        : [];
+      try {
+        localStorage.setItem(CART_STORAGE_KEY_V2, JSON.stringify(minimal));
+      } catch (e) {
+        console.error(e);
+        // As a last resort, clear legacy cart to prevent app crash
+        localStorage.removeItem(CART_STORAGE_KEY_V1);
+      }
+      setCart(minimal.map((x) => ({
+        id: x.id,
+        quantity: x.quantity,
+        name: "",
+        image: "",
+        retailPrice: 0,
+        wholesalePrice: 0,
+        minWholesaleQty: 0,
+      })) as unknown as CartItem[]);
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("sunny_cart", JSON.stringify(cart));
+    // Persist minimal cart only to avoid localStorage quota exceeded (base64 images are huge)
+    const minimal: StoredCartItem[] = cart.map((i) => ({ id: i.id, quantity: i.quantity }));
+    try {
+      localStorage.setItem(CART_STORAGE_KEY_V2, JSON.stringify(minimal));
+    } catch (e) {
+      console.error(e);
+    }
   }, [cart]);
 
   useEffect(() => {
@@ -91,14 +136,15 @@ const Order = () => {
         const loaded = await DataService.getProducts();
         setProducts(loaded);
 
-        // เติมรูปสินค้าในตะกร้า (กรณีตะกร้าเก่าไม่มีรูป หรือรูปเป็นค่าว่าง)
+        // Hydrate cart items from products
         setCart((prev) =>
-          prev.map((item) => {
-            if (item?.image) return item;
-            const p = loaded.find((x) => x.id === item.id);
-            if (p?.image) return { ...item, image: p.image };
-            return item;
-          })
+          prev
+            .map((item) => {
+              const p = loaded.find((x) => x.id === item.id);
+              if (!p) return null;
+              return { ...p, quantity: item.quantity };
+            })
+            .filter(Boolean) as CartItem[]
         );
       } catch (e) {
         console.error(e);
@@ -236,7 +282,7 @@ const Order = () => {
 
     // รวมเงิน
     ctx.font = "bold 16px Arial";
-    ctx.fillText(`รวมทั้งหมด: ฿${getTotal()}`, 40, y);
+    ctx.fillText(`รวมทั้พิม ์฿${getTotal()}`, 40, y);
 
     // โลโก้ด้านล่าง
     try {

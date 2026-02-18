@@ -14,15 +14,16 @@ interface ProductCardProps {
 const ProductCard = ({ product, index, enableAddToCart = false }: ProductCardProps) => {
   const handleAddToCart = () => {
     try {
-      const raw = localStorage.getItem("sunny_cart");
-      const cart: Array<Product & { quantity: number }> = raw ? JSON.parse(raw) : [];
+      const key = "sunny_cart_v2";
+      const raw = localStorage.getItem(key);
+      const cart: Array<{ id: string; quantity: number }> = raw ? JSON.parse(raw) : [];
       const existing = cart.find((i) => i.id === product.id);
       if (existing) {
         existing.quantity += 1;
       } else {
-        cart.push({ ...product, quantity: 1 });
+        cart.push({ id: product.id, quantity: 1 });
       }
-      localStorage.setItem("sunny_cart", JSON.stringify(cart));
+      localStorage.setItem(key, JSON.stringify(cart));
       toast.success("เพิ่มลงตะกร้าแล้ว");
     } catch (e) {
       console.error(e);
