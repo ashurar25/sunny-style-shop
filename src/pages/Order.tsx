@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Minus, Trash2, Facebook, Print, Image } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Trash2, Facebook, Printer, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -205,7 +205,7 @@ const Order = () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handlePrint} className="rounded-full">
-              <Print className="w-4 h-4 mr-1" /> ปริ้น
+              <Printer className="w-4 h-4 mr-1" /> ปริ้น
             </Button>
             <Button variant="outline" onClick={handleCaptureReceipt} className="rounded-full">
               <Image className="w-4 h-4 mr-1" /> จับภาพใบเสร็จ
