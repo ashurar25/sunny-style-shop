@@ -187,19 +187,34 @@ export async function updateProductInDB(id, updates) {
   }
 
   try {
-    const fields = Object.keys(updates).filter(key => key !== 'id');
-    if (fields.length === 0) return;
+    if (!updates || typeof updates !== 'object') return;
 
-    const setClause = fields.map(field => {
-      const dbField = field.replace(/([A-Z])/g, '_$1').toLowerCase();
-      return `${dbField} = ${updates[field]}`;
-    }).join(', ');
+    const allowed = {
+      name: 'name',
+      image: 'image',
+      retailPrice: 'retail_price',
+      wholesalePrice: 'wholesale_price',
+      minWholesaleQty: 'min_wholesale_qty',
+      description: 'description',
+      category: 'category',
+    };
 
-    await sql`
-      UPDATE products 
-      SET ${setClause}, updated_at = CURRENT_TIMESTAMP 
-      WHERE id = ${id}
-    `;
+    const entries = Object.entries(updates).filter(([key]) => key in allowed);
+    if (entries.length === 0) return;
+
+    // Build a parameterized query safely.
+    // Note: sql template only parameterizes values, not identifiers.
+    const sets = [];
+    const values = [];
+    for (const [key, value] of entries) {
+      const col = allowed[key];
+      sets.push(`${col} = $${values.length + 1}`);
+      values.push(value);
+    }
+    values.push(id);
+
+    const query = `UPDATE products SET ${sets.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${values.length}`;
+    await sql(query, values);
   } catch (error) {
     console.error('Error updating product:', error);
     throw error;
