@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/products";
 import { Package } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
   product: Product;
@@ -16,7 +17,7 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
       transition={{ delay: index * 0.1, duration: 0.5 }}
       className="glass rounded-[var(--radius)] overflow-hidden shadow-card hover:shadow-warm transition-all duration-300 hover:-translate-y-1 group"
     >
-      <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden">
+      <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden relative">
         {product.image ? (
           <img
             src={product.image}
@@ -25,6 +26,11 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
           />
         ) : (
           <Package className="w-16 h-16 text-muted-foreground/40" />
+        )}
+        {product.category && (
+          <Badge className="absolute top-3 left-3 gradient-warm text-primary-foreground border-0 text-xs">
+            {product.category}
+          </Badge>
         )}
       </div>
       

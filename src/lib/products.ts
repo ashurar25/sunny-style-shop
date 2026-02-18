@@ -6,9 +6,13 @@ export interface Product {
   wholesalePrice: number;
   minWholesaleQty: number;
   description?: string;
+  category?: string;
 }
 
 const STORAGE_KEY = 'krungkring_products';
+const CATEGORIES_KEY = 'krungkring_categories';
+
+const defaultCategories: string[] = ['ของทอด', 'กุ้ง', 'ไก่', 'อื่นๆ'];
 
 const defaultProducts: Product[] = [
   {
@@ -19,6 +23,7 @@ const defaultProducts: Product[] = [
     wholesalePrice: 45,
     minWholesaleQty: 10,
     description: 'ปอเปี๊ยะทอดกรอบ ไส้แน่น อร่อยสดใหม่ทุกวัน',
+    category: 'ของทอด',
   },
   {
     id: '2',
@@ -28,6 +33,7 @@ const defaultProducts: Product[] = [
     wholesalePrice: 60,
     minWholesaleQty: 10,
     description: 'ไก่ทอดกรอบนอกนุ่มใน หอมเครื่องเทศ',
+    category: 'ไก่',
   },
   {
     id: '3',
@@ -37,6 +43,7 @@ const defaultProducts: Product[] = [
     wholesalePrice: 75,
     minWholesaleQty: 10,
     description: 'กุ้งทอดกรอบ ตัวใหญ่ เนื้อแน่น',
+    category: 'กุ้ง',
   },
 ];
 
@@ -73,4 +80,37 @@ export function deleteProduct(id: string) {
 export function updateProduct(id: string, updates: Partial<Product>) {
   const products = getProducts().map(p => p.id === id ? { ...p, ...updates } : p);
   saveProducts(products);
+}
+
+// Category management
+export function getCategories(): string[] {
+  const stored = localStorage.getItem(CATEGORIES_KEY);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return defaultCategories;
+    }
+  }
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(defaultCategories));
+  return defaultCategories;
+}
+
+export function saveCategories(categories: string[]) {
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+}
+
+export function addCategory(name: string): string[] {
+  const categories = getCategories();
+  if (!categories.includes(name)) {
+    categories.push(name);
+    saveCategories(categories);
+  }
+  return categories;
+}
+
+export function deleteCategory(name: string): string[] {
+  const categories = getCategories().filter(c => c !== name);
+  saveCategories(categories);
+  return categories;
 }
