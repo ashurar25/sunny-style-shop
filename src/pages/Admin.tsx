@@ -334,20 +334,26 @@ const Admin = () => {
             <div className="grid grid-cols-3 gap-3">
               <Input
                 type="number"
+                inputMode="decimal"
+                step="any"
                 placeholder="ราคาปลีก"
-                value={form.retailPrice}
+                value={form.retailPrice ?? ""}
                 onChange={e => setForm(f => ({ ...f, retailPrice: e.target.value }))}
               />
               <Input
                 type="number"
+                inputMode="decimal"
+                step="any"
                 placeholder="ราคาส่ง"
-                value={form.wholesalePrice}
+                value={form.wholesalePrice ?? ""}
                 onChange={e => setForm(f => ({ ...f, wholesalePrice: e.target.value }))}
               />
               <Input
                 type="number"
+                inputMode="numeric"
+                step="1"
                 placeholder="ขั้นต่ำ (ชิ้น)"
-                value={form.minWholesaleQty}
+                value={form.minWholesaleQty ?? ""}
                 onChange={e => setForm(f => ({ ...f, minWholesaleQty: e.target.value }))}
               />
             </div>
