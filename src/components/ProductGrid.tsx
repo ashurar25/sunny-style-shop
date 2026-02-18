@@ -30,18 +30,18 @@ const ProductGrid = () => {
     : products;
 
   return (
-    <section id="products" className="py-20 px-4 max-w-6xl mx-auto">
+    <section id="products" className="py-10 px-4 max-w-6xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center mb-12"
+        className="text-center mb-6"
       >
         <span className="text-sm font-semibold text-primary tracking-widest uppercase">เมนูแนะนำ</span>
         <h2 className="text-3xl md:text-5xl font-extrabold text-foreground mt-2">
           สินค้าของเรา
         </h2>
-        <p className="mt-3 text-muted-foreground text-lg">สดใหม่ อร่อย ราคาถูก</p>
+        <p className="mt-2 text-muted-foreground text-base">สดใหม่ อร่อย ราคาถูก</p>
       </motion.div>
 
       {/* Category filter pills */}
@@ -50,11 +50,11 @@ const ProductGrid = () => {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-2 mb-10"
+          className="flex flex-wrap justify-center gap-2 mb-6"
         >
           <button
             onClick={() => setActiveCategory(null)}
-            className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
               activeCategory === null
                 ? "gradient-warm text-primary-foreground shadow-warm"
                 : "bg-card text-muted-foreground hover:text-foreground border border-border hover:border-primary/30 hover:shadow-sm"
@@ -66,7 +66,7 @@ const ProductGrid = () => {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
                 activeCategory === cat
                   ? "gradient-warm text-primary-foreground shadow-warm"
                   : "bg-card text-muted-foreground hover:text-foreground border border-border hover:border-primary/30 hover:shadow-sm"
@@ -83,7 +83,7 @@ const ProductGrid = () => {
           ยังไม่มีสินค้า{activeCategory ? ` ในหมวด "${activeCategory}"` : ""}
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} enableAddToCart />
           ))}

@@ -30,7 +30,7 @@ const contacts = [
 
 const ContactSection = () => {
   return (
-    <section className="py-20 px-4 relative overflow-hidden">
+    <section className="py-10 px-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-muted/50" />
       
@@ -44,12 +44,12 @@ const ContactSection = () => {
           <h2 className="text-3xl md:text-5xl font-extrabold text-foreground mt-2 mb-4">
             ติดต่อเรา
           </h2>
-          <p className="text-muted-foreground text-lg mb-12">
+          <p className="text-muted-foreground text-base mb-6">
             สั่งซื้อสินค้าหรือสอบถามรายละเอียดเพิ่มเติม
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {contacts.map((c, i) => (
             <motion.a
               key={c.label}
@@ -61,7 +61,7 @@ const ContactSection = () => {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ y: -4, scale: 1.02 }}
-              className="glass rounded-2xl p-7 flex flex-col items-center gap-4 hover:shadow-warm transition-all duration-300 group"
+              className="glass rounded-2xl p-5 flex flex-col items-center gap-3 hover:shadow-warm transition-all duration-300 group"
             >
               <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${c.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                 <c.icon className={`w-7 h-7 ${c.iconColor}`} />

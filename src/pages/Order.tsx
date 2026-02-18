@@ -270,11 +270,11 @@ const Order = () => {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
         {/* Customer Info */}
-        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+        <div className="glass rounded-[var(--radius)] p-4 space-y-3">
           <h2 className="font-semibold text-lg text-foreground">ข้อมูลผู้สั่งซื้อ</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Input
               placeholder="ชื่อ-นามสกุล"
               value={customerInfo.name}
@@ -301,13 +301,13 @@ const Order = () => {
         </div>
 
         {/* Add Products Section */}
-        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+        <div className="glass rounded-[var(--radius)] p-4 space-y-3">
           <h2 className="font-semibold text-lg text-foreground">เลือกสินค้า</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {products.map((product) => (
               <div
                 key={product.id}
-                className="glass rounded-[var(--radius)] p-4 space-y-3 hover:shadow-warm transition-all duration-300"
+                className="glass rounded-[var(--radius)] p-4 space-y-2 hover:shadow-warm transition-all duration-300"
               >
                 <div className="w-full h-32 rounded-xl bg-muted overflow-hidden">
                   {product.image ? (
@@ -333,7 +333,7 @@ const Order = () => {
         </div>
 
         {/* Cart */}
-        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+        <div className="glass rounded-[var(--radius)] p-4 space-y-3">
           <div className="flex items-center justify-between gap-4">
             <h2 className="font-semibold text-lg text-foreground">ตะกร้าสินค้า</h2>
             <div className="text-sm text-muted-foreground">รวม ฿{getTotal()}</div>
@@ -393,7 +393,7 @@ const Order = () => {
         </div>
 
         {/* Receipt Actions */}
-        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+        <div className="glass rounded-[var(--radius)] p-4 space-y-3">
           <h2 className="font-semibold text-lg text-foreground">ใบเสร็จ</h2>
           <div className="flex flex-col sm:flex-row gap-2">
             <Button onClick={handlePrintReceipt} className="gradient-warm text-primary-foreground flex-1">

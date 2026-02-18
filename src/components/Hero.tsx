@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="gradient-hero min-h-[70vh] flex flex-col items-center justify-center px-4 pt-10 pb-16 relative overflow-hidden">
+    <section className="gradient-hero min-h-[60vh] flex flex-col items-center justify-center px-4 pt-8 pb-10 relative overflow-hidden">
       {/* Decorative floating shapes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -58,7 +58,7 @@ const Hero = () => {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="text-center mt-8 space-y-3"
+        className="text-center mt-6 space-y-2"
       >
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-foreground tracking-tight leading-tight">
           กรุ้งกริ้ง{" "}
@@ -78,7 +78,7 @@ const Hero = () => {
         transition={{ delay: 0.5, duration: 0.5 }}
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.97 }}
-        className="mt-10 gradient-warm text-primary-foreground px-10 py-4 rounded-2xl font-semibold text-lg shadow-warm cursor-pointer flex items-center gap-2"
+        className="mt-7 gradient-warm text-primary-foreground px-8 py-3 rounded-2xl font-semibold text-base shadow-warm cursor-pointer flex items-center gap-2"
       >
         ดูสินค้าทั้งหมด
         <ChevronDown className="w-5 h-5" />
