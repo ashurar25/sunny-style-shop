@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Minus, Trash2, Facebook, Print, Camera } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Trash2, Facebook, Print, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -208,7 +208,7 @@ const Order = () => {
               <Print className="w-4 h-4 mr-1" /> ปริ้น
             </Button>
             <Button variant="outline" onClick={handleCaptureReceipt} className="rounded-full">
-              <Camera className="w-4 h-4 mr-1" /> จับภาพใบเสร็จ
+              <Image className="w-4 h-4 mr-1" /> จับภาพใบเสร็จ
             </Button>
             <Button onClick={handleSendReceiptToFacebook} className="gradient-warm text-primary-foreground rounded-full">
               <Facebook className="w-4 h-4 mr-1" /> ส่งใบเสร็จ
