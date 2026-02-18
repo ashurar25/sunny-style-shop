@@ -1,0 +1,392 @@
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Plus, Minus, Trash2, Facebook, Print, Camera } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { getProducts, type Product } from "@/lib/products";
+
+interface CartItem extends Product {
+  quantity: number;
+}
+
+const Order = () => {
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [customerInfo, setCustomerInfo] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    note: "",
+  });
+  const [receiptImage, setReceiptImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem("sunny_cart");
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("sunny_cart", JSON.stringify(cart));
+  }, [cart]);
+
+  const addToCart = (product: Product) => {
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+    toast.success("เพิ่มลงตะกร้าแล้ว");
+  };
+
+  const updateQuantity = (id: number, delta: number) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const removeFromCart = (id: number) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+    toast.success("ลบออกจากตะกร้าแล้ว");
+  };
+
+  const getTotal = () => {
+    return cart.reduce(
+      (sum, item) =>
+        sum +
+        (item.quantity >= item.min_wholesale_qty
+          ? item.wholesale_price
+          : item.retail_price) *
+          item.quantity,
+      0
+    );
+  };
+
+  const generateOrderSummary = () => {
+    const items = cart
+      .map(
+        (item) =>
+          `${item.name} x${item.quantity} = ฿${
+            item.quantity >= item.min_wholesale_qty
+              ? item.wholesale_price
+              : item.retail_price
+          }/ชิ้น`
+      )
+      .join("\n");
+
+    const total = getTotal();
+    const summary = `📋 รายการสั่งซื้อ\n${items}\n\n💰 รวมทั้งหมด: ฿${total}\n\n👤 ข้อมูลผู้สั่ง\nชื่อ: ${customerInfo.name}\nเบอร์โทร: ${customerInfo.phone}\nที่อยู่: ${customerInfo.address}\nหมายเหตุ: ${customerInfo.note}`;
+
+    return summary;
+  };
+
+  const handlePrint = () => {
+    if (cart.length === 0) {
+      toast.error("กรุณาเลือกสินค้าก่อน");
+      return;
+    }
+    if (!customerInfo.name || !customerInfo.phone) {
+      toast.error("กรุณากรอกชื่อและเบอร์โทร");
+      return;
+    }
+    window.print();
+  };
+
+  const handleCaptureReceipt = () => {
+    if (cart.length === 0) {
+      toast.error("กรุณาเลือกสินค้าก่อน");
+      return;
+    }
+    if (!customerInfo.name || !customerInfo.phone) {
+      toast.error("กรุณากรอกชื่อและเบอร์โทร");
+      return;
+    }
+
+    // สร้างใบเสร็จ
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = 400;
+    canvas.height = 600;
+
+    // พื้นหลังขาว
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // หัวข้อความ
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('ใบเสร็จ กรุ้งกริ้ง ทอดกรอบ', canvas.width / 2, 40);
+
+    ctx.font = '14px Arial';
+    ctx.fillText('--------------------------------', canvas.width / 2, 60);
+
+    // ข้อมูลลูกค้า
+    ctx.textAlign = 'left';
+    ctx.fillText(`ชื่อ: ${customerInfo.name}`, 40, 90);
+    ctx.fillText(`เบอร์โทร: ${customerInfo.phone}`, 40, 110);
+    if (customerInfo.address) {
+      ctx.fillText(`ที่อยู่: ${customerInfo.address}`, 40, 130);
+    }
+    if (customerInfo.note) {
+      ctx.fillText(`หมายเหตุ: ${customerInfo.note}`, 40, 150);
+    }
+
+    ctx.fillText('--------------------------------', 40, 170);
+
+    // รายการสินค้า
+    let y = 200;
+    ctx.font = '12px Arial';
+    cart.forEach((item) => {
+      const price = item.quantity >= item.min_wholesale_qty ? item.wholesale_price : item.retail_price;
+      const total = price * item.quantity;
+      
+      ctx.fillText(`${item.name}`, 40, y);
+      ctx.fillText(`x${item.item}`, 250, y);
+      ctx.fillText(`฿${total}`, 320, y);
+      y += 20;
+    });
+
+    ctx.fillText('--------------------------------', 40, y);
+    y += 20;
+
+    // รวมเงิน
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(`รวมทั้งหมด: ฿${getTotal()}`, 40, y);
+
+    // แปลงเป็นรูป
+    const imageUrl = canvas.toDataURL('image/png');
+    setReceiptImage(imageUrl);
+    toast.success('จับภาพใบเสร็จแล้ว');
+  };
+
+  const handleSendReceiptToFacebook = () => {
+    if (!receiptImage) {
+      toast.error("กรุณาจับภาพใบเสร็จก่อน");
+      return;
+    }
+
+    const summary = generateOrderSummary();
+    const message = `📸 ใบเสร็จการสั่งซื้อ\n\n${summary}\n\n🖼️ รูปใบเสร็จ:`;
+    const encoded = encodeURIComponent(message);
+    const fbUrl = `https://www.facebook.com/Kenginol.ar/messages/?text=${encoded}`;
+    window.open(fbUrl, '_blank');
+    toast.success('เปิดหน้าส่งรูปใบเสร็จไป Facebook แล้ว');
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="glass sticky top-0 z-40 border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </Link>
+            <h1 className="text-xl font-bold text-foreground">สั่งซื้อสินค้า</h1>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handlePrint} className="rounded-full">
+              <Print className="w-4 h-4 mr-1" /> ปริ้น
+            </Button>
+            <Button variant="outline" onClick={handleCaptureReceipt} className="rounded-full">
+              <Camera className="w-4 h-4 mr-1" /> จับภาพใบเสร็จ
+            </Button>
+            <Button onClick={handleSendReceiptToFacebook} className="gradient-warm text-primary-foreground rounded-full">
+              <Facebook className="w-4 h-4 mr-1" /> ส่งใบเสร็จ
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Customer Info */}
+        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+          <h2 className="font-semibold text-lg text-foreground">ข้อมูลผู้สั่งซื้อ</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              placeholder="ชื่อ-นามสกุล"
+              value={customerInfo.name}
+              onChange={(e) => setCustomerInfo((s) => ({ ...s, name: e.target.value }))}
+            />
+            <Input
+              placeholder="เบอร์โทรศัพท์"
+              value={customerInfo.phone}
+              onChange={(e) => setCustomerInfo((s) => ({ ...s, phone: e.target.value }))}
+            />
+          </div>
+          <Textarea
+            placeholder="ที่อยู่จัดส่ง"
+            value={customerInfo.address}
+            onChange={(e) => setCustomerInfo((s) => ({ ...s, address: e.target.value }))}
+            rows={2}
+          />
+          <Textarea
+            placeholder="หมายเหตุ (ถ้ามี)"
+            value={customerInfo.note}
+            onChange={(e) => setCustomerInfo((s) => ({ ...s, note: e.target.value }))}
+            rows={2}
+          />
+        </div>
+
+        {/* Cart */}
+        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+          <h2 className="font-semibold text-lg text-foreground">ตะกร้าสินค้า</h2>
+          {cart.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">ยังไม่มีสินค้าในตะกร้า</p>
+          ) : (
+            <div className="space-y-3">
+              {cart.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 p-3 bg-muted/30 rounded-xl"
+                >
+                  <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
+                        ไม่มีรูป
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground truncate">{item.name}</h3>
+                      {item.category_name && (
+                        <Badge variant="secondary" className="text-xs shrink-0">
+                          {item.category_name}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      ฿{item.quantity >= item.min_wholesale_qty ? item.wholesale_price : item.retail_price}/ชิ้น
+                      {item.quantity < item.min_wholesale_qty && (
+                        <span className="text-xs text-primary ml-1">
+                          (ขั้นต่ำ {item.min_wholesale_qty} ชิ้น ราคาส่ง)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateQuantity(item.id, -1)}
+                      className="w-8 h-8 p-0"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <span className="w-8 text-center font-medium">{item.quantity}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateQuantity(item.id, 1)}
+                      className="w-8 h-8 p-0"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeFromCart(item.id)}
+                      className="w-8 h-8 p-0 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Receipt Preview */}
+        {receiptImage && (
+          <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+            <h2 className="font-semibold text-lg text-foreground">ตัวอย่างใบเสร็จ</h2>
+            <div className="bg-white p-4 rounded-lg">
+              <img src={receiptImage} alt="ใบเสร็จ" className="w-full" />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setReceiptImage(null)} className="flex-1">
+                ปิดตัวอย่าง
+              </Button>
+              <Button onClick={handleSendReceiptToFacebook} className="gradient-warm text-primary-foreground flex-1">
+                <Facebook className="w-4 h-4 mr-1" /> ส่งรูปไป Facebook
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Add Products Section */}
+        <div className="glass rounded-[var(--radius)] p-6 space-y-4">
+          <h2 className="font-semibold text-lg text-foreground">เพิ่มสินค้า</h2>
+          <ProductGrid onAddToCart={addToCart} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Simple ProductGrid component for order page
+const ProductGrid = ({ onAddToCart }: { onAddToCart: (product: Product) => void }) => {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getProducts().then(setProducts);
+  }, []);
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {products.map((product) => (
+        <div
+          key={product.id}
+          className="glass rounded-[var(--radius)] p-4 space-y-3 hover:shadow-warm transition-all duration-300"
+        >
+          <div className="w-full h-32 rounded-xl bg-muted overflow-hidden">
+            {product.image_url ? (
+              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
+                ไม่มีรูป
+              </div>
+            )}
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
+            <p className="text-sm text-muted-foreground">
+              ฿{product.retail_price} | ฿{product.wholesale_price} (ขั้นต่ำ {product.min_wholesale_qty})
+            </p>
+          </div>
+          <Button
+            onClick={() => onAddToCart(product)}
+            className="w-full gradient-warm text-primary-foreground"
+          >
+            เพิ่มลงตะกร้า
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default Order;

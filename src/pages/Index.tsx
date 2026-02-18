@@ -2,7 +2,7 @@ import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import ContactSection from "@/components/ContactSection";
 import { Link } from "react-router-dom";
-import { Settings } from "lucide-react";
+import { Settings, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ADMIN_AUTH_KEY = "krungkring_admin_authed";
@@ -27,23 +27,37 @@ const Index = () => {
         </p>
       </footer>
 
-      {/* Admin FAB */}
-      {authed && (
+      {/* FABs */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 1, type: "spring" }}
-          className="fixed bottom-6 right-6 z-50"
         >
           <Link
-            to="/admin"
-            className="w-14 h-14 gradient-warm rounded-2xl flex items-center justify-center shadow-warm hover:scale-110 hover:rounded-xl transition-all duration-300"
-            title="แอดมิน"
+            to="/order"
+            className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg hover:scale-110 hover:rounded-xl transition-all duration-300 text-white"
+            title="สั่งซื้อ"
           >
-            <Settings className="w-6 h-6 text-primary-foreground" />
+            <ShoppingCart className="w-6 h-6" />
           </Link>
         </motion.div>
-      )}
+        {authed && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 1.2, type: "spring" }}
+          >
+            <Link
+              to="/admin"
+              className="w-14 h-14 gradient-warm rounded-2xl flex items-center justify-center shadow-warm hover:scale-110 hover:rounded-xl transition-all duration-300"
+              title="แอดมิน"
+            >
+              <Settings className="w-6 h-6 text-primary-foreground" />
+            </Link>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };
