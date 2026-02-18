@@ -29,7 +29,20 @@ const Order = () => {
   useEffect(() => {
     const savedCart = localStorage.getItem("sunny_cart");
     if (savedCart) {
-      setCart(JSON.parse(savedCart));
+      try {
+        const parsed = JSON.parse(savedCart);
+        const migrated = Array.isArray(parsed)
+          ? parsed.map((item: any) => {
+              if (item && !item.image && item.image_url) {
+                return { ...item, image: item.image_url };
+              }
+              return item;
+            })
+          : [];
+        setCart(migrated);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, []);
 
@@ -300,38 +313,6 @@ const Order = () => {
           />
         </div>
 
-        {/* Add Products Section */}
-        <div className="glass rounded-[var(--radius)] p-4 space-y-3">
-          <h2 className="font-semibold text-lg text-foreground">เลือกสินค้า</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="glass rounded-[var(--radius)] p-4 space-y-2 hover:shadow-warm transition-all duration-300"
-              >
-                <div className="w-full h-32 rounded-xl bg-muted overflow-hidden">
-                  {product.image ? (
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
-                      ไม่มีรูป
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    ฿{product.retailPrice} | ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})
-                  </p>
-                </div>
-                <Button onClick={() => addToCart(product)} className="w-full gradient-warm text-primary-foreground">
-                  เพิ่มลงตะกร้า
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Cart */}
         <div className="glass rounded-[var(--radius)] p-4 space-y-3">
           <div className="flex items-center justify-between gap-4">
@@ -346,7 +327,14 @@ const Order = () => {
                 <div key={item.id} className="flex items-center gap-4 p-3 bg-muted/30 rounded-xl">
                   <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
                     {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        onError={() => {
+                          setCart((prev) => prev.map((p) => (p.id === item.id ? { ...p, image: "" } : p)));
+                        }}
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
                         ไม่มีรูป
