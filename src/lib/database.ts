@@ -112,8 +112,15 @@ export async function getProductsFromDB() {
 
   try {
     const products = await sql`
-      SELECT id, name, image, retail_price as retailPrice, wholesale_price as wholesalePrice, 
-             min_wholesale_qty as minWholesaleQty, description, category
+      SELECT
+        id,
+        name,
+        image,
+        retail_price::float8 as "retailPrice",
+        wholesale_price::float8 as "wholesalePrice",
+        min_wholesale_qty::int as "minWholesaleQty",
+        description,
+        category
       FROM products 
       ORDER BY created_at DESC
     `;

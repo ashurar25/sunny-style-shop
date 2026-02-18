@@ -61,7 +61,7 @@ const Order = () => {
     toast.success("เพิ่มลงตะกร้าแล้ว");
   };
 
-  const updateQuantity = (id: number, delta: number) => {
+  const updateQuantity = (id: string, delta: number) => {
     setCart((prev) =>
       prev
         .map((item) =>
@@ -73,7 +73,7 @@ const Order = () => {
     );
   };
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (id: string) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
     toast.success("ลบออกจากตะกร้าแล้ว");
   };
@@ -82,9 +82,9 @@ const Order = () => {
     return cart.reduce(
       (sum, item) =>
         sum +
-        (item.quantity >= item.min_wholesale_qty
-          ? item.wholesale_price
-          : item.retail_price) *
+        (item.quantity >= item.minWholesaleQty
+          ? item.wholesalePrice
+          : item.retailPrice) *
           item.quantity,
       0
     );
@@ -95,9 +95,9 @@ const Order = () => {
       .map(
         (item) =>
           `${item.name} x${item.quantity} = ฿${
-            item.quantity >= item.min_wholesale_qty
-              ? item.wholesale_price
-              : item.retail_price
+            item.quantity >= item.minWholesaleQty
+              ? item.wholesalePrice
+              : item.retailPrice
           }/ชิ้น`
       )
       .join("\n");
@@ -168,7 +168,7 @@ const Order = () => {
     let y = 200;
     ctx.font = '12px Arial';
     cart.forEach((item) => {
-      const price = item.quantity >= item.min_wholesale_qty ? item.wholesale_price : item.retail_price;
+      const price = item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice;
       const total = price * item.quantity;
       
       ctx.fillText(`${item.name}`, 40, y);
@@ -243,9 +243,6 @@ const Order = () => {
             <Button variant="outline" onClick={handleCaptureReceipt} className="rounded-full">
               <Image className="w-4 h-4 mr-1" /> จับภาพใบเสร็จ
             </Button>
-            <Button onClick={handleSendReceiptToFacebook} className="gradient-warm text-primary-foreground rounded-full">
-              <Facebook className="w-4 h-4 mr-1" /> ส่งใบเสร็จ
-            </Button>
           </div>
         </div>
       </header>
@@ -293,8 +290,8 @@ const Order = () => {
                   className="flex items-center gap-4 p-3 bg-muted/30 rounded-xl"
                 >
                   <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-                    {item.image_url ? (
-                      <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
                         ไม่มีรูป
@@ -304,17 +301,17 @@ const Order = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-foreground truncate">{item.name}</h3>
-                      {item.category_name && (
+                      {item.category && (
                         <Badge variant="secondary" className="text-xs shrink-0">
-                          {item.category_name}
+                          {item.category}
                         </Badge>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      ฿{item.quantity >= item.min_wholesale_qty ? item.wholesale_price : item.retail_price}/ชิ้น
-                      {item.quantity < item.min_wholesale_qty && (
+                      ฿{item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice}/ชิ้น
+                      {item.quantity < item.minWholesaleQty && (
                         <span className="text-xs text-primary ml-1">
-                          (ขั้นต่ำ {item.min_wholesale_qty} ชิ้น ราคาส่ง)
+                          (ขั้นต่ำ {item.minWholesaleQty} ชิ้น ราคาส่ง)
                         </span>
                       )}
                     </p>
