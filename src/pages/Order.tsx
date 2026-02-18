@@ -25,6 +25,7 @@ const Order = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const receiptLogoUrl = "/logo.png";
+  const cartFallbackImageUrl = "/placeholder.svg";
 
   useEffect(() => {
     const savedCart = localStorage.getItem("sunny_cart");
@@ -336,13 +337,15 @@ const Order = () => {
               {cart.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 p-3 bg-muted/30 rounded-xl">
                   <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-                    {item.image ? (
+                    {item.image || cartFallbackImageUrl ? (
                       <img
-                        src={item.image}
+                        src={item.image || cartFallbackImageUrl}
                         alt={item.name}
                         className="w-full h-full object-cover"
-                        onError={() => {
-                          setCart((prev) => prev.map((p) => (p.id === item.id ? { ...p, image: "" } : p)));
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          if (img.src.endsWith(cartFallbackImageUrl)) return;
+                          img.src = cartFallbackImageUrl;
                         }}
                       />
                     ) : (
