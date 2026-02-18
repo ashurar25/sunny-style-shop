@@ -8,7 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
+const ADMIN_AUTH_KEY = "krungkring_admin_authed";
+const ADMIN_ID = "kenginol";
+const ADMIN_PASS = "930425";
+
 const Admin = () => {
+  const [authed, setAuthed] = useState(false);
+  const [login, setLogin] = useState({ id: "", pass: "" });
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -26,9 +32,31 @@ const Admin = () => {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    setAuthed(localStorage.getItem(ADMIN_AUTH_KEY) === "1");
     setProducts(getProducts());
     setCategories(getCategories());
   }, []);
+
+  const handleLogin = () => {
+    if (!login.id || !login.pass) {
+      toast.error("กรุณากรอกข้อมูลให้ครบ");
+      return;
+    }
+    if (login.id !== ADMIN_ID || login.pass !== ADMIN_PASS) {
+      toast.error("รหัสไม่ถูกต้อง");
+      return;
+    }
+    localStorage.setItem(ADMIN_AUTH_KEY, "1");
+    setAuthed(true);
+    setLogin({ id: "", pass: "" });
+    toast.success("เข้าสู่ระบบแล้ว");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(ADMIN_AUTH_KEY);
+    setAuthed(false);
+    toast.success("ออกจากระบบแล้ว");
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -80,6 +108,44 @@ const Admin = () => {
     toast.success("ลบหมวดหมู่แล้ว");
   };
 
+  if (!authed) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="glass w-full max-w-md rounded-[var(--radius)] p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </Link>
+            <h1 className="text-xl font-bold text-foreground">เข้าสู่ระบบแอดมิน</h1>
+          </div>
+
+          <div className="space-y-3">
+            <Input
+              placeholder="ID"
+              value={login.id}
+              onChange={(e) => setLogin((s) => ({ ...s, id: e.target.value }))}
+              autoComplete="username"
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={login.pass}
+              onChange={(e) => setLogin((s) => ({ ...s, pass: e.target.value }))}
+              autoComplete="current-password"
+              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+            />
+            <Button onClick={handleLogin} className="w-full gradient-warm text-primary-foreground">
+              เข้าสู่ระบบ
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -92,6 +158,9 @@ const Admin = () => {
             <h1 className="text-xl font-bold text-foreground">จัดการสินค้า</h1>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={handleLogout} className="rounded-full">
+              ออกจากระบบ
+            </Button>
             <Button
               variant="outline"
               onClick={() => setShowCategoryForm(!showCategoryForm)}
