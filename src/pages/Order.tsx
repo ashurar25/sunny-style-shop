@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Plus, Minus, Trash2, Facebook, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,41 @@ import { DataService, type Product } from "@/lib/data-service";
 
 interface CartItem extends Product {
   quantity: number;
+}
+
+type OrderErrorBoundaryState = { hasError: boolean; message: string };
+
+class OrderErrorBoundary extends React.Component<React.PropsWithChildren, OrderErrorBoundaryState> {
+  declare state: OrderErrorBoundaryState;
+
+  constructor(props: React.PropsWithChildren) {
+    super(props);
+    this.state = { hasError: false, message: "" };
+  }
+
+  static getDerivedStateFromError(error: unknown) {
+    return { hasError: true, message: error instanceof Error ? error.message : String(error) };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.error(error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center px-4">
+          <div className="glass w-full max-w-md rounded-[var(--radius)] p-6 space-y-3">
+            <div className="text-lg font-semibold text-foreground">หน้าออเดอร์มีปัญหา</div>
+            <div className="text-sm text-muted-foreground break-words">{this.state.message}</div>
+            <div className="text-xs text-muted-foreground">ลองรีเฟรชหน้า หรือแจ้งข้อความนี้ให้ผู้ดูแล</div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 const Order = () => {
@@ -281,6 +316,7 @@ const Order = () => {
   };
 
   return (
+    <OrderErrorBoundary>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="glass sticky top-0 z-40 border-b border-border">
@@ -337,22 +373,16 @@ const Order = () => {
               {cart.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 p-3 bg-muted/30 rounded-xl">
                   <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-                    {item.image || cartFallbackImageUrl ? (
-                      <img
-                        src={item.image || cartFallbackImageUrl}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const img = e.currentTarget;
-                          if (img.src.endsWith(cartFallbackImageUrl)) return;
-                          img.src = cartFallbackImageUrl;
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">
-                        ไม่มีรูป
-                      </div>
-                    )}
+                    <img
+                      src={item.image || cartFallbackImageUrl}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        if (img.src.endsWith(cartFallbackImageUrl)) return;
+                        img.src = cartFallbackImageUrl;
+                      }}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -427,6 +457,7 @@ const Order = () => {
         </div>
       </div>
     </div>
+    </OrderErrorBoundary>
   );
 };
 
