@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProducts, getCategories, type Product } from "@/lib/products";
+import { DataService, type Product } from "@/lib/data-service";
 import ProductCard from "./ProductCard";
 import { motion } from "framer-motion";
 
@@ -9,8 +9,20 @@ const ProductGrid = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   useEffect(() => {
-    setProducts(getProducts());
-    setCategories(getCategories());
+    const loadData = async () => {
+      try {
+        const [productsData, categoriesData] = await Promise.all([
+          DataService.getProducts(),
+          DataService.getCategories()
+        ]);
+        setProducts(productsData);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    
+    loadData();
   }, []);
 
   const filtered = activeCategory
