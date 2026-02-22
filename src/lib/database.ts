@@ -111,7 +111,7 @@ export async function getProductsFromDB() {
   }
 
   try {
-    const products = await sql`
+    const rows = await sql`
       SELECT
         id,
         name,
@@ -124,7 +124,7 @@ export async function getProductsFromDB() {
       FROM products 
       ORDER BY created_at DESC
     `;
-    return products;
+    return rows as unknown as import('./products').Product[];
   } catch (error) {
     console.error('Error fetching products:', error);
     throw error;
