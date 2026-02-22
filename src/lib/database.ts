@@ -1,12 +1,13 @@
 import { neon } from '@neondatabase/serverless';
 
 // Database connection
+const DATABASE_URL = import.meta.env.VITE_DATABASE_URL || 'postgresql://neondb_owner:npg_pq2xNLg1BCJS@ep-soft-tooth-a1ppjto0-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+
 const getDatabase = () => {
-  const databaseUrl = import.meta.env.VITE_DATABASE_URL;
-  if (!databaseUrl || databaseUrl === '') {
+  if (!DATABASE_URL) {
     return null;
   }
-  return neon(databaseUrl);
+  return neon(DATABASE_URL);
 };
 
 // Initialize database tables

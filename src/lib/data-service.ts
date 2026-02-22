@@ -5,9 +5,9 @@ import * as localStorageFunctions from './products-db';
 // Re-export Product type
 export type { Product } from './products';
 
-// Check if database URL is available
+// Database is always available since we have a hardcoded fallback URL
 const isDatabaseAvailable = () => {
-  return !!import.meta.env.VITE_DATABASE_URL && import.meta.env.VITE_DATABASE_URL !== '';
+  return true;
 };
 
 // Data service that automatically chooses between database and localStorage
