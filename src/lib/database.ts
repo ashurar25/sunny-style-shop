@@ -7,20 +7,27 @@ const getDatabase = () => {
   if (!DATABASE_URL) {
     return null;
   }
-  return neon(DATABASE_URL, { arrayMode: false, fullResults: false });
+  return neon(DATABASE_URL);
 };
+
+// Helper: run a query and return rows as objects (forces arrayMode: false)
+async function queryObjects(queryStr: string, params: unknown[] = []) {
+  const sql = getDatabase();
+  if (!sql) throw new Error('Database not available');
+  return await sql(queryStr, params, { arrayMode: false, fullResults: false });
+}
+
+// Helper: run a command (no result needed)
+async function execute(queryStr: string, params: unknown[] = []) {
+  const sql = getDatabase();
+  if (!sql) throw new Error('Database not available');
+  await sql(queryStr, params);
+}
 
 // Initialize database tables
 export async function initDatabase() {
-  const sql = getDatabase();
-  if (!sql) {
-    console.log('Database URL not available, skipping initialization');
-    return;
-  }
-
   try {
-    // Create products table
-    await sql`
+    await execute(`
       CREATE TABLE IF NOT EXISTS products (
         id VARCHAR(255) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -33,67 +40,36 @@ export async function initDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
+    `);
 
-    // Create categories table
-    await sql`
+    await execute(`
       CREATE TABLE IF NOT EXISTS categories (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) UNIQUE NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
+    `);
 
-    // Insert default categories if empty
-    const existingCategories = await sql`SELECT COUNT(*) as count FROM categories`;
-    if (existingCategories[0].count === 0) {
+    const existingCategories = await queryObjects('SELECT COUNT(*) as count FROM categories');
+    if (Number(existingCategories[0]?.count) === 0) {
       const defaultCategories = ['ของทอด', 'กุ้ง', 'ไก่', 'อื่นๆ'];
       for (const category of defaultCategories) {
-        await sql`INSERT INTO categories (name) VALUES (${category})`;
+        await execute('INSERT INTO categories (name) VALUES ($1)', [category]);
       }
     }
 
-    // Insert default products if empty
-    const existingProducts = await sql`SELECT COUNT(*) as count FROM products`;
-    if (existingProducts[0].count === 0) {
+    const existingProducts = await queryObjects('SELECT COUNT(*) as count FROM products');
+    if (Number(existingProducts[0]?.count) === 0) {
       const defaultProducts = [
-        {
-          id: '1',
-          name: 'ปอเปี๊ยะทอดกรอบ',
-          image: '',
-          retail_price: 59,
-          wholesale_price: 45,
-          min_wholesale_qty: 10,
-          description: 'ปอเปี๊ยะทอดกรอบ ไส้แน่น อร่อยสดใหม่ทุกวัน',
-          category: 'ของทอด',
-        },
-        {
-          id: '2',
-          name: 'ไก่ทอดกรอบ',
-          image: '',
-          retail_price: 79,
-          wholesale_price: 60,
-          min_wholesale_qty: 10,
-          description: 'ไก่ทอดกรอบนอกนุ่มใน หอมเครื่องเทศ',
-          category: 'ไก่',
-        },
-        {
-          id: '3',
-          name: 'กุ้งทอดกรอบ',
-          image: '',
-          retail_price: 99,
-          wholesale_price: 75,
-          min_wholesale_qty: 10,
-          description: 'กุ้งทอดกรอบ ตัวใหญ่ เนื้อแน่น',
-          category: 'กุ้ง',
-        },
+        { id: '1', name: 'ปอเปี๊ยะทอดกรอบ', image: '', retail_price: 59, wholesale_price: 45, min_wholesale_qty: 10, description: 'ปอเปี๊ยะทอดกรอบ ไส้แน่น อร่อยสดใหม่ทุกวัน', category: 'ของทอด' },
+        { id: '2', name: 'ไก่ทอดกรอบ', image: '', retail_price: 79, wholesale_price: 60, min_wholesale_qty: 10, description: 'ไก่ทอดกรอบนอกนุ่มใน หอมเครื่องเทศ', category: 'ไก่' },
+        { id: '3', name: 'กุ้งทอดกรอบ', image: '', retail_price: 99, wholesale_price: 75, min_wholesale_qty: 10, description: 'กุ้งทอดกรอบ ตัวใหญ่ เนื้อแน่น', category: 'กุ้ง' },
       ];
-
-      for (const product of defaultProducts) {
-        await sql`
-          INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category)
-          VALUES (${product.id}, ${product.name}, ${product.image}, ${product.retail_price}, ${product.wholesale_price}, ${product.min_wholesale_qty}, ${product.description}, ${product.category})
-        `;
+      for (const p of defaultProducts) {
+        await execute(
+          'INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+          [p.id, p.name, p.image, p.retail_price, p.wholesale_price, p.min_wholesale_qty, p.description, p.category]
+        );
       }
     }
 
@@ -106,13 +82,8 @@ export async function initDatabase() {
 
 // Product functions
 export async function getProductsFromDB() {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
   try {
-    const rows = await sql`
+    const rows = await queryObjects(`
       SELECT
         id,
         name,
@@ -124,7 +95,7 @@ export async function getProductsFromDB() {
         category
       FROM products 
       ORDER BY created_at DESC
-    `;
+    `);
     return rows as unknown as import('./products').Product[];
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -132,22 +103,14 @@ export async function getProductsFromDB() {
   }
 }
 
-export async function saveProductsToDB(products) {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
+export async function saveProductsToDB(products: any[]) {
   try {
-    // Clear existing products
-    await sql`DELETE FROM products`;
-    
-    // Insert all products
+    await execute('DELETE FROM products');
     for (const product of products) {
-      await sql`
-        INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category)
-        VALUES (${product.id}, ${product.name}, ${product.image}, ${product.retailPrice}, ${product.wholesalePrice}, ${product.minWholesaleQty}, ${product.description}, ${product.category})
-      `;
+      await execute(
+        'INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+        [product.id, product.name, product.image, product.retailPrice, product.wholesalePrice, product.minWholesaleQty, product.description, product.category]
+      );
     }
   } catch (error) {
     console.error('Error saving products:', error);
@@ -155,18 +118,13 @@ export async function saveProductsToDB(products) {
   }
 }
 
-export async function addProductToDB(product) {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
+export async function addProductToDB(product: any) {
   try {
     const id = Date.now().toString();
-    await sql`
-      INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category)
-      VALUES (${id}, ${product.name}, ${product.image}, ${product.retailPrice}, ${product.wholesalePrice}, ${product.minWholesaleQty}, ${product.description}, ${product.category})
-    `;
+    await execute(
+      'INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+      [id, product.name, product.image, product.retailPrice, product.wholesalePrice, product.minWholesaleQty, product.description, product.category]
+    );
     return { ...product, id };
   } catch (error) {
     console.error('Error adding product:', error);
@@ -174,30 +132,20 @@ export async function addProductToDB(product) {
   }
 }
 
-export async function deleteProductFromDB(id) {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
+export async function deleteProductFromDB(id: string) {
   try {
-    await sql`DELETE FROM products WHERE id = ${id}`;
+    await execute('DELETE FROM products WHERE id = $1', [id]);
   } catch (error) {
     console.error('Error deleting product:', error);
     throw error;
   }
 }
 
-export async function updateProductInDB(id, updates) {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
+export async function updateProductInDB(id: string, updates: any) {
   try {
     if (!updates || typeof updates !== 'object') return;
 
-    const allowed = {
+    const allowed: Record<string, string> = {
       name: 'name',
       image: 'image',
       retailPrice: 'retail_price',
@@ -210,10 +158,8 @@ export async function updateProductInDB(id, updates) {
     const entries = Object.entries(updates).filter(([key]) => key in allowed);
     if (entries.length === 0) return;
 
-    // Build a parameterized query safely.
-    // Note: sql template only parameterizes values, not identifiers.
-    const sets = [];
-    const values = [];
+    const sets: string[] = [];
+    const values: unknown[] = [];
     for (const [key, value] of entries) {
       const col = allowed[key];
       sets.push(`${col} = $${values.length + 1}`);
@@ -221,8 +167,7 @@ export async function updateProductInDB(id, updates) {
     }
     values.push(id);
 
-    const query = `UPDATE products SET ${sets.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${values.length}`;
-    await sql(query, values);
+    await execute(`UPDATE products SET ${sets.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${values.length}`, values);
   } catch (error) {
     console.error('Error updating product:', error);
     throw error;
@@ -231,28 +176,18 @@ export async function updateProductInDB(id, updates) {
 
 // Category functions
 export async function getCategoriesFromDB() {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
   try {
-    const categories = await sql`SELECT name FROM categories ORDER BY name`;
-    return categories.map(cat => cat.name);
+    const categories = await queryObjects('SELECT name FROM categories ORDER BY name');
+    return categories.map((cat: any) => cat.name);
   } catch (error) {
     console.error('Error fetching categories:', error);
     throw error;
   }
 }
 
-export async function addCategoryToDB(name) {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
+export async function addCategoryToDB(name: string) {
   try {
-    await sql`INSERT INTO categories (name) VALUES (${name})`;
+    await execute('INSERT INTO categories (name) VALUES ($1)', [name]);
     return await getCategoriesFromDB();
   } catch (error) {
     console.error('Error adding category:', error);
@@ -260,14 +195,9 @@ export async function addCategoryToDB(name) {
   }
 }
 
-export async function deleteCategoryFromDB(name) {
-  const sql = getDatabase();
-  if (!sql) {
-    throw new Error('Database not available');
-  }
-
+export async function deleteCategoryFromDB(name: string) {
   try {
-    await sql`DELETE FROM categories WHERE name = ${name}`;
+    await execute('DELETE FROM categories WHERE name = $1', [name]);
     return await getCategoriesFromDB();
   } catch (error) {
     console.error('Error deleting category:', error);
