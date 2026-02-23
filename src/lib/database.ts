@@ -7,7 +7,7 @@ const getDatabase = () => {
   if (!DATABASE_URL) {
     return null;
   }
-  return neon(DATABASE_URL);
+  return neon(DATABASE_URL, { arrayMode: false, fullResults: false });
 };
 
 // Initialize database tables
