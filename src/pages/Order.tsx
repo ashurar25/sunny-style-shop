@@ -246,7 +246,7 @@ const Order = () => {
     ctx.fillStyle = "#000000";
     ctx.font = "bold 20px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("ใบเสร็จ กรุ้งกริ้ง ทอดกรอบ", canvas.width / 2, 40);
+    ctx.fillText("ใบเสร็จ กรุ๊งกริ๊ง ทอดกรอบ", canvas.width / 2, 40);
 
     ctx.font = "14px Arial";
     ctx.fillText("--------------------------------", canvas.width / 2, 60);
