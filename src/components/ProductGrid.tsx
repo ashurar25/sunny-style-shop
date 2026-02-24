@@ -4,6 +4,7 @@ import ProductCard from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,13 +12,14 @@ const ProductGrid = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [visibleCount, setVisibleCount] = useState(20);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const [productsData, categoriesData] = await Promise.all([
-          DataService.getProducts(),
-          DataService.getCategories()
+          DataService.getProductsFromDBOnly(),
+          DataService.getCategoriesFromDBOnly()
         ]);
         setProducts(productsData);
         setCategories(categoriesData);
@@ -29,6 +31,10 @@ const ProductGrid = () => {
     };
     
     loadData();
+  useEffect(() => {
+    setVisibleCount(20);
+  }, [activeCategory, query]);
+
   }, []);
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -50,6 +56,8 @@ const ProductGrid = () => {
     if (!normalizedQuery) return true;
     return (p.name || "").toLowerCase().includes(normalizedQuery);
   });
+
+  const visibleProducts = filtered.slice(0, visibleCount);
 
   return (
     <section id="products" className="py-10 px-4 max-w-6xl mx-auto">
@@ -127,10 +135,29 @@ const ProductGrid = () => {
             : `ยังไม่มีสินค้า${activeCategory ? ` ในหมวด "${activeCategory}"` : ""}`}
         </p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-          {filtered.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} enableAddToCart />
-          ))}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            {visibleProducts.map((product, i) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                index={i}
+                enableAddToCart
+                highPriorityImage={i < 5}
+              />
+            ))}
+          </div>
+          {filtered.length > visibleCount && (
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => setVisibleCount((c) => c + 20)}
+                className="rounded-full"
+              >
+                ดูเพิ่ม
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </section>

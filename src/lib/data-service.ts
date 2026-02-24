@@ -55,11 +55,8 @@ export class DataService {
       return cache.products.data;
     }
 
-    // Serve localStorage instantly, revalidate in background
-    const local = localStorageFunctions.getProducts();
-    cache.products = { data: local, timestamp: Date.now() };
-    DataService._fetchProducts().catch(() => {});
-    return local;
+    // DB-only first load: don't serve localStorage immediately.
+    return DataService._fetchProducts();
   }
 
   private static async _fetchProducts(): Promise<Product[]> {
@@ -67,11 +64,13 @@ export class DataService {
       // Try Cloud first (faster, same region)
       const data = await withTimeout(cloudDb.getProductsFromCloud(), DB_FETCH_TIMEOUT_MS);
       cache.products = { data, timestamp: Date.now() };
+      localStorageFunctions.saveProducts(data);
       return data;
     } catch {
       try {
         const data = await withTimeout(neonDb.getProductsFromDB(), DB_FETCH_TIMEOUT_MS);
         cache.products = { data, timestamp: Date.now() };
+        localStorageFunctions.saveProducts(data);
         return data;
       } catch {
         const data = localStorageFunctions.getProducts();
@@ -89,21 +88,21 @@ export class DataService {
       return cache.categories.data;
     }
 
-    const local = localStorageFunctions.getCategories();
-    cache.categories = { data: local, timestamp: Date.now() };
-    DataService._fetchCategories().catch(() => {});
-    return local;
+    // DB-only first load: don't serve localStorage immediately.
+    return DataService._fetchCategories();
   }
 
   private static async _fetchCategories(): Promise<string[]> {
     try {
       const data = await withTimeout(cloudDb.getCategoriesFromCloud(), DB_FETCH_TIMEOUT_MS);
       cache.categories = { data, timestamp: Date.now() };
+      localStorageFunctions.saveCategories(data);
       return data;
     } catch {
       try {
         const data = await withTimeout(neonDb.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS);
         cache.categories = { data, timestamp: Date.now() };
+        localStorageFunctions.saveCategories(data);
         return data;
       } catch {
         const data = localStorageFunctions.getCategories();
@@ -111,6 +110,17 @@ export class DataService {
         return data;
       }
     }
+  }
+
+  // DB-only fetchers (no cache, no localStorage read). Useful for pages that must always load from DB.
+  static async getProductsFromDBOnly(): Promise<Product[]> {
+    const data = await DataService._fetchProducts();
+    return data;
+  }
+
+  static async getCategoriesFromDBOnly(): Promise<string[]> {
+    const data = await DataService._fetchCategories();
+    return data;
   }
 
   private static _invalidateCache() {

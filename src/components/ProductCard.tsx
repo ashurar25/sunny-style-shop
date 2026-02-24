@@ -9,9 +9,10 @@ interface ProductCardProps {
   product: Product;
   index: number;
   enableAddToCart?: boolean;
+  highPriorityImage?: boolean;
 }
 
-const ProductCard = ({ product, index, enableAddToCart = false }: ProductCardProps) => {
+const ProductCard = ({ product, index, enableAddToCart = false, highPriorityImage = false }: ProductCardProps) => {
   const handleAddToCart = () => {
     try {
       const key = "sunny_cart_v2";
@@ -45,6 +46,8 @@ const ProductCard = ({ product, index, enableAddToCart = false }: ProductCardPro
           <img
             src={product.image}
             alt={product.name}
+            loading={highPriorityImage ? "eager" : "lazy"}
+            decoding="async"
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
           />
         ) : (
