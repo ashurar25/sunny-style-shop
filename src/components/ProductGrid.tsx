@@ -13,6 +13,8 @@ const ProductGrid = () => {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(20);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const debug = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("debug") === "1";
 
   useEffect(() => {
     const loadData = async () => {
@@ -23,8 +25,10 @@ const ProductGrid = () => {
         ]);
         setProducts(productsData);
         setCategories(categoriesData);
+        setLoadError(null);
       } catch (error) {
         console.error('Error loading data:', error);
+        setLoadError(error instanceof Error ? error.message : String(error));
       } finally {
         setLoading(false);
       }
@@ -61,6 +65,15 @@ const ProductGrid = () => {
 
   return (
     <section id="products" className="py-10 px-4 max-w-6xl mx-auto">
+      {debug && (
+        <div className="mb-4 rounded-xl border border-border bg-card p-4 text-sm">
+          <div className="font-semibold">Debug</div>
+          <div>loading: {String(loading)}</div>
+          <div>products: {products.length}</div>
+          <div>categories: {categories.length}</div>
+          <div>error: {loadError ?? "-"}</div>
+        </div>
+      )}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
