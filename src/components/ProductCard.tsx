@@ -38,7 +38,7 @@ const ProductCard = ({ product, index, enableAddToCart = false, highPriorityImag
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1, duration: 0.5 }}
-      className="glass rounded-[1.5rem] overflow-hidden shadow-card group"
+      className="glass rounded-2xl overflow-hidden shadow-card group"
     >
       <div className="aspect-[4/3] bg-gradient-to-br from-muted to-muted/60 flex items-center justify-center overflow-hidden relative">
         {product.image ? (
@@ -56,39 +56,39 @@ const ProductCard = ({ product, index, enableAddToCart = false, highPriorityImag
           </div>
         )}
         {product.category && (
-          <Badge className="absolute top-3 left-3 gradient-warm text-primary-foreground border-0 text-xs shadow-warm/50 rounded-lg px-3">
+          <Badge className="absolute top-2 left-2 gradient-warm text-primary-foreground border-0 text-[11px] shadow-warm/50 rounded-md px-2 py-0.5">
             {product.category}
           </Badge>
         )}
 
         {product.pinned && (
-          <Badge className="absolute top-3 right-3 bg-orange-500 text-white border-0 text-xs shadow-warm/50 rounded-lg px-3">
+          <Badge className="absolute top-2 right-2 bg-orange-500 text-white border-0 text-[11px] shadow-warm/50 rounded-md px-2 py-0.5">
             <Flame className="w-3 h-3 mr-1" /> ขายดี
           </Badge>
         )}
       </div>
       
-      <div className="p-5 space-y-3">
-        <h3 className="font-bold text-lg text-foreground leading-snug">{product.name}</h3>
+      <div className="p-4 space-y-2">
+        <h3 className="font-bold text-base text-foreground leading-snug line-clamp-2">{product.name}</h3>
         {product.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{product.description}</p>
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{product.description}</p>
         )}
         
-        <div className="space-y-2 pt-1">
+        <div className="space-y-1.5 pt-0.5">
           <div className="flex items-baseline justify-between">
-            <span className="text-sm text-muted-foreground">ราคาปลีก</span>
-            <span className="text-2xl font-extrabold text-primary">฿{product.retailPrice}</span>
+            <span className="text-xs text-muted-foreground">ราคาปลีก</span>
+            <span className="text-xl font-extrabold text-primary">฿{product.retailPrice}</span>
           </div>
-          <div className="flex items-center justify-between bg-secondary/30 rounded-xl px-4 py-2.5 border border-secondary/20">
-            <span className="text-xs text-muted-foreground">
+          <div className="flex items-center justify-between bg-secondary/30 rounded-lg px-3 py-2 border border-secondary/20">
+            <span className="text-[11px] text-muted-foreground">
               ส่ง ขั้นต่ำ {product.minWholesaleQty} ชิ้น
             </span>
-            <span className="text-lg font-bold text-accent-foreground">฿{product.wholesalePrice}</span>
+            <span className="text-base font-bold text-accent-foreground">฿{product.wholesalePrice}</span>
           </div>
         </div>
 
         {enableAddToCart && (
-          <Button onClick={handleAddToCart} className="w-full gradient-warm text-primary-foreground">
+          <Button onClick={handleAddToCart} className="w-full gradient-warm text-primary-foreground h-9 text-sm">
             เพิ่มลงตะกร้า
           </Button>
         )}
