@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type ChangeEvent } from "react";
 import { compressImage } from "@/lib/image-compress";
 import { DataService, type Product } from "@/lib/data-service";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ImagePlus, Tag, X } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ImagePlus, Tag, X, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -131,6 +131,29 @@ const Admin = () => {
     } catch (e) {
       console.error(e);
       toast.error("ลบไม่สำเร็จ");
+    }
+  };
+
+  const handleTogglePin = async (product: Product) => {
+    const isPinned = !!product.pinned;
+    if (!isPinned) {
+      const pinnedCount = products.filter(p => !!p.pinned).length;
+      if (pinnedCount >= 5) {
+        toast.error("ปักหมุดได้สูงสุด 5 รายการ");
+        return;
+      }
+    }
+
+    try {
+      await DataService.updateProduct(product.id, {
+        pinned: !isPinned,
+        pinnedAt: !isPinned ? Date.now() : undefined,
+      });
+      setProducts(await DataService.getProducts());
+      toast.success(!isPinned ? "ปักหมุดแล้ว" : "ถอนหมุดแล้ว");
+    } catch (e) {
+      console.error(e);
+      toast.error("ทำรายการไม่สำเร็จ");
     }
   };
 
@@ -383,7 +406,18 @@ const Admin = () => {
 
         {/* Product list */}
         <div className="space-y-3">
-          {products.map(product => (
+          {products
+            .slice()
+            .sort((a, b) => {
+              const ap = a.pinned ? 1 : 0;
+              const bp = b.pinned ? 1 : 0;
+              if (ap !== bp) return bp - ap;
+              const at = a.pinnedAt ?? 0;
+              const bt = b.pinnedAt ?? 0;
+              if (at !== bt) return bt - at;
+              return Number(b.id) - Number(a.id);
+            })
+            .map(product => (
             <div
               key={product.id}
               className="glass rounded-[var(--radius)] p-4 flex items-center gap-4"
@@ -400,6 +434,11 @@ const Admin = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
+                  {product.pinned && (
+                    <Badge className="text-xs shrink-0 gradient-warm text-primary-foreground border-0" variant="secondary">
+                      ขายดี
+                    </Badge>
+                  )}
                   {product.category && (
                     <Badge variant="secondary" className="text-xs shrink-0">
                       {product.category}
@@ -410,6 +449,22 @@ const Admin = () => {
                   ปลีก ฿{product.retailPrice} | ส่ง ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})
                 </p>
               </div>
+              <Button
+                variant="outline"
+                onClick={() => handleTogglePin(product)}
+                className="rounded-xl shrink-0"
+                title={product.pinned ? "ถอนหมุด" : "ปักหมุด"}
+              >
+                {product.pinned ? (
+                  <>
+                    <PinOff className="w-4 h-4 mr-1" /> ถอนหมุด
+                  </>
+                ) : (
+                  <>
+                    <Pin className="w-4 h-4 mr-1" /> ปักหมุด
+                  </>
+                )}
+              </Button>
               <Button variant="outline" onClick={() => startEdit(product)} className="rounded-xl shrink-0">
                 แก้ไข
               </Button>

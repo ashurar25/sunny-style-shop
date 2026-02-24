@@ -7,6 +7,8 @@ export interface Product {
   minWholesaleQty: number;
   description?: string;
   category?: string;
+  pinned?: boolean;
+  pinnedAt?: number;
 }
 
 const STORAGE_KEY = 'krungkring_products';

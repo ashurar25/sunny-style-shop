@@ -20,6 +20,8 @@ export async function getProductsFromCloud(): Promise<Product[]> {
     minWholesaleQty: Number(row.min_wholesale_qty),
     description: row.description || '',
     category: row.category || '',
+    pinned: !!row.pinned,
+    pinnedAt: row.pinned_at ? Number(row.pinned_at) : undefined,
   }));
 }
 
@@ -34,6 +36,8 @@ export async function addProductToCloud(product: Omit<Product, 'id'>): Promise<P
     min_wholesale_qty: product.minWholesaleQty,
     description: product.description,
     category: product.category,
+    pinned: !!product.pinned,
+    pinned_at: product.pinnedAt ?? null,
   });
   if (error) throw error;
   return { ...product, id };
@@ -53,6 +57,8 @@ export async function updateProductInCloud(id: string, updates: Partial<Product>
   if (updates.minWholesaleQty !== undefined) mapped.min_wholesale_qty = updates.minWholesaleQty;
   if (updates.description !== undefined) mapped.description = updates.description;
   if (updates.category !== undefined) mapped.category = updates.category;
+  if (updates.pinned !== undefined) mapped.pinned = !!updates.pinned;
+  if (updates.pinnedAt !== undefined) mapped.pinned_at = updates.pinnedAt ?? null;
   mapped.updated_at = new Date().toISOString();
 
   const { error } = await supabase.from('products').update(mapped).eq('id', id);
@@ -71,6 +77,8 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
     min_wholesale_qty: p.minWholesaleQty,
     description: p.description,
     category: p.category,
+    pinned: !!p.pinned,
+    pinned_at: p.pinnedAt ?? null,
   }));
   const { error } = await supabase.from('products').insert(rows);
   if (error) throw error;

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/products";
-import { Package } from "lucide-react";
+import { Flame, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -56,6 +56,12 @@ const ProductCard = ({ product, index, enableAddToCart = false }: ProductCardPro
         {product.category && (
           <Badge className="absolute top-3 left-3 gradient-warm text-primary-foreground border-0 text-xs shadow-warm/50 rounded-lg px-3">
             {product.category}
+          </Badge>
+        )}
+
+        {product.pinned && (
+          <Badge className="absolute top-3 right-3 bg-orange-500 text-white border-0 text-xs shadow-warm/50 rounded-lg px-3">
+            <Flame className="w-3 h-3 mr-1" /> ขายดี
           </Badge>
         )}
       </div>

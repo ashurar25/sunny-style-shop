@@ -33,7 +33,19 @@ const ProductGrid = () => {
 
   const normalizedQuery = query.trim().toLowerCase();
 
-  const filtered = products.filter((p) => {
+  const sorted = products
+    .slice()
+    .sort((a, b) => {
+      const ap = a.pinned ? 1 : 0;
+      const bp = b.pinned ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      const at = a.pinnedAt ?? 0;
+      const bt = b.pinnedAt ?? 0;
+      if (at !== bt) return bt - at;
+      return Number(b.id) - Number(a.id);
+    });
+
+  const filtered = sorted.filter((p) => {
     if (activeCategory && p.category !== activeCategory) return false;
     if (!normalizedQuery) return true;
     return (p.name || "").toLowerCase().includes(normalizedQuery);
