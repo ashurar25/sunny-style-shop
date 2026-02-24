@@ -116,16 +116,20 @@ export class DataService {
   static async getProductsFromDBOnly(): Promise<Product[]> {
     try {
       const data = await withTimeout(cloudDb.getProductsFromCloud(), DB_FETCH_TIMEOUT_MS);
+      console.log('[DataService] getProductsFromDBOnly: cloud', { count: data.length });
       cache.products = { data, timestamp: Date.now() };
       localStorageFunctions.saveProducts(data);
       return data;
-    } catch {
+    } catch (e) {
+      console.warn('[DataService] getProductsFromDBOnly: cloud failed', e);
       try {
         const data = await withTimeout(neonDb.getProductsFromDB(), DB_FETCH_TIMEOUT_MS);
+        console.log('[DataService] getProductsFromDBOnly: neon', { count: data.length });
         cache.products = { data, timestamp: Date.now() };
         localStorageFunctions.saveProducts(data);
         return data;
-      } catch {
+      } catch (e2) {
+        console.warn('[DataService] getProductsFromDBOnly: neon failed', e2);
         cache.products = { data: [], timestamp: Date.now() };
         return [];
       }
@@ -135,16 +139,20 @@ export class DataService {
   static async getCategoriesFromDBOnly(): Promise<string[]> {
     try {
       const data = await withTimeout(cloudDb.getCategoriesFromCloud(), DB_FETCH_TIMEOUT_MS);
+      console.log('[DataService] getCategoriesFromDBOnly: cloud', { count: data.length });
       cache.categories = { data, timestamp: Date.now() };
       localStorageFunctions.saveCategories(data);
       return data;
-    } catch {
+    } catch (e) {
+      console.warn('[DataService] getCategoriesFromDBOnly: cloud failed', e);
       try {
         const data = await withTimeout(neonDb.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS);
+        console.log('[DataService] getCategoriesFromDBOnly: neon', { count: data.length });
         cache.categories = { data, timestamp: Date.now() };
         localStorageFunctions.saveCategories(data);
         return data;
-      } catch {
+      } catch (e2) {
+        console.warn('[DataService] getCategoriesFromDBOnly: neon failed', e2);
         cache.categories = { data: [], timestamp: Date.now() };
         return [];
       }

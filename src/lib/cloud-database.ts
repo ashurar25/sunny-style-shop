@@ -9,9 +9,17 @@ export async function getProductsFromCloud(): Promise<Product[]> {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error('[cloud-db] getProductsFromCloud error:', error);
+    throw error;
+  }
 
-  return (data || []).map((row: any) => ({
+  if (!data || data.length === 0) {
+    console.warn('[cloud-db] getProductsFromCloud: empty result');
+    return [];
+  }
+
+  return data.map((row: any) => ({
     id: row.id,
     name: row.name,
     image: row.image || '',
@@ -89,8 +97,15 @@ export async function getCategoriesFromCloud(): Promise<string[]> {
     .from('categories')
     .select('name')
     .order('name');
-  if (error) throw error;
-  return (data || []).map((c: any) => c.name);
+  if (error) {
+    console.error('[cloud-db] getCategoriesFromCloud error:', error);
+    throw error;
+  }
+  if (!data || data.length === 0) {
+    console.warn('[cloud-db] getCategoriesFromCloud: empty result');
+    return [];
+  }
+  return data.map((c: any) => c.name);
 }
 
 export async function addCategoryToCloud(name: string): Promise<string[]> {
