@@ -16,6 +16,24 @@ const cache: {
 
 const CACHE_TTL = 60_000; // 1 minute – serve cached, revalidate in background
 
+const DB_FETCH_TIMEOUT_MS = 2500;
+
+function withTimeout<T>(promise: Promise<T>, ms: number) {
+  return new Promise<T>((resolve, reject) => {
+    const id = setTimeout(() => reject(new Error('Timeout')), ms);
+    promise.then(
+      (v) => {
+        clearTimeout(id);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(id);
+        reject(e);
+      }
+    );
+  });
+}
+
 function isCacheFresh(timestamp: number) {
   return Date.now() - timestamp < CACHE_TTL;
 }
@@ -23,20 +41,25 @@ function isCacheFresh(timestamp: number) {
 // Data service that automatically chooses between database and localStorage
 export class DataService {
   static async getProducts(): Promise<Product[]> {
-    // Return cached data instantly if available
+    // Fast-path: return cached data instantly if available
     if (cache.products.data !== null) {
       if (!isCacheFresh(cache.products.timestamp)) {
-        // Stale – revalidate in background
         DataService._fetchProducts().catch(() => {});
       }
       return cache.products.data;
     }
-    return DataService._fetchProducts();
+
+    // Fast-path: serve localStorage immediately to avoid slow DB on poor networks,
+    // then revalidate from DB in background.
+    const local = localStorageFunctions.getProducts();
+    cache.products = { data: local, timestamp: Date.now() };
+    DataService._fetchProducts().catch(() => {});
+    return local;
   }
 
   private static async _fetchProducts(): Promise<Product[]> {
     try {
-      const data = await dbFunctions.getProductsFromDB();
+      const data = await withTimeout(dbFunctions.getProductsFromDB(), DB_FETCH_TIMEOUT_MS);
       cache.products = { data, timestamp: Date.now() };
       return data;
     } catch (error) {
@@ -54,12 +77,16 @@ export class DataService {
       }
       return cache.categories.data;
     }
-    return DataService._fetchCategories();
+
+    const local = localStorageFunctions.getCategories();
+    cache.categories = { data: local, timestamp: Date.now() };
+    DataService._fetchCategories().catch(() => {});
+    return local;
   }
 
   private static async _fetchCategories(): Promise<string[]> {
     try {
-      const data = await dbFunctions.getCategoriesFromDB();
+      const data = await withTimeout(dbFunctions.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS);
       cache.categories = { data, timestamp: Date.now() };
       return data;
     } catch (error) {
