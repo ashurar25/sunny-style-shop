@@ -38,8 +38,7 @@ const ProductCard = ({ product, index, enableAddToCart = false, highPriorityImag
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1, duration: 0.5 }}
-      whileHover={{ y: -6 }}
-      className="glass rounded-[1.5rem] overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-500 group"
+      className="glass rounded-[1.5rem] overflow-hidden shadow-card group"
     >
       <div className="aspect-[4/3] bg-gradient-to-br from-muted to-muted/60 flex items-center justify-center overflow-hidden relative">
         {product.image ? (
