@@ -15,7 +15,15 @@ const cache: {
 };
 
 const CACHE_TTL = 60_000;
-const DB_FETCH_TIMEOUT_MS = 2500;
+const DB_FETCH_TIMEOUT_MS = 10_000;
+
+async function retryOnce<T>(fn: () => Promise<T>) {
+  try {
+    return await fn();
+  } catch {
+    return await fn();
+  }
+}
 
 function withTimeout<T>(promise: Promise<T>, ms: number) {
   return new Promise<T>((resolve, reject) => {
@@ -115,7 +123,7 @@ export class DataService {
   // DB-only fetchers (no cache, no localStorage read). Useful for pages that must always load from DB.
   static async getProductsFromDBOnly(): Promise<Product[]> {
     try {
-      const data = await withTimeout(cloudDb.getProductsFromCloud(), DB_FETCH_TIMEOUT_MS);
+      const data = await retryOnce(() => withTimeout(cloudDb.getProductsFromCloud(), DB_FETCH_TIMEOUT_MS));
       console.log('[DataService] getProductsFromDBOnly: cloud', { count: data.length });
       cache.products = { data, timestamp: Date.now() };
       localStorageFunctions.saveProducts(data);
@@ -123,7 +131,7 @@ export class DataService {
     } catch (e) {
       console.warn('[DataService] getProductsFromDBOnly: cloud failed', e);
       try {
-        const data = await withTimeout(neonDb.getProductsFromDB(), DB_FETCH_TIMEOUT_MS);
+        const data = await retryOnce(() => withTimeout(neonDb.getProductsFromDB(), DB_FETCH_TIMEOUT_MS));
         console.log('[DataService] getProductsFromDBOnly: neon', { count: data.length });
         cache.products = { data, timestamp: Date.now() };
         localStorageFunctions.saveProducts(data);
@@ -138,7 +146,7 @@ export class DataService {
 
   static async getCategoriesFromDBOnly(): Promise<string[]> {
     try {
-      const data = await withTimeout(cloudDb.getCategoriesFromCloud(), DB_FETCH_TIMEOUT_MS);
+      const data = await retryOnce(() => withTimeout(cloudDb.getCategoriesFromCloud(), DB_FETCH_TIMEOUT_MS));
       console.log('[DataService] getCategoriesFromDBOnly: cloud', { count: data.length });
       cache.categories = { data, timestamp: Date.now() };
       localStorageFunctions.saveCategories(data);
@@ -146,7 +154,7 @@ export class DataService {
     } catch (e) {
       console.warn('[DataService] getCategoriesFromDBOnly: cloud failed', e);
       try {
-        const data = await withTimeout(neonDb.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS);
+        const data = await retryOnce(() => withTimeout(neonDb.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS));
         console.log('[DataService] getCategoriesFromDBOnly: neon', { count: data.length });
         cache.categories = { data, timestamp: Date.now() };
         localStorageFunctions.saveCategories(data);
