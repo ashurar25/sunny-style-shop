@@ -12,7 +12,7 @@ const ProductGrid = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [visibleCount, setVisibleCount] = useState(20);
+  const [visibleCount, setVisibleCount] = useState(8);
   const [loadError, setLoadError] = useState<string | null>(null);
   const debug = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("debug") === "1";
 
@@ -38,7 +38,7 @@ const ProductGrid = () => {
   }, []);
 
   useEffect(() => {
-    setVisibleCount(20);
+    setVisibleCount(8);
   }, [activeCategory, query]);
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -136,7 +136,7 @@ const ProductGrid = () => {
             กำลังโหลดข้อมูลสินค้า...
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {[...Array(10)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
           </div>
@@ -164,10 +164,10 @@ const ProductGrid = () => {
             <div className="flex justify-center">
               <Button
                 variant="outline"
-                onClick={() => setVisibleCount((c) => c + 20)}
+                onClick={() => setVisibleCount((c) => c + 12)}
                 className="rounded-full"
               >
-                ดูเพิ่ม
+                ดูเพิ่ม ({filtered.length - visibleCount})
               </Button>
             </div>
           )}

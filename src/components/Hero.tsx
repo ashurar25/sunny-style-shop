@@ -8,6 +8,7 @@ const Hero = () => {
       {/* Decorative floating shapes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 opacity-[0.28] [background:radial-gradient(circle_at_20%_12%,hsla(var(--primary)/0.12),transparent_55%),radial-gradient(circle_at_80%_22%,hsla(var(--secondary)/0.10),transparent_50%),radial-gradient(circle_at_55%_78%,hsla(var(--accent)/0.10),transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.15] [background:linear-gradient(135deg,hsla(var(--primary)/0.08),hsla(var(--secondary)/0.06),hsla(var(--accent)/0.08))]" />
         <motion.div
           initial={false}
           className="absolute top-[8%] left-[8%] w-20 h-20 rounded-3xl bg-primary/8 rotate-12"
@@ -37,15 +38,15 @@ const Hero = () => {
         className="relative will-change-transform"
       >
         {/* Glow ring */}
-        <div className="absolute -inset-6 rounded-[3.25rem] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/14 blur-2xl" />
+        <div className="absolute -inset-6 rounded-[3.25rem] bg-gradient-to-br from-primary/30 via-secondary/16 to-accent/20 blur-2xl" />
         
-        <div className="relative w-52 h-52 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-[2.5rem] gradient-card shadow-warm border border-border/35 flex items-center justify-center p-6 backdrop-blur-sm">
+        <div className="relative w-52 h-52 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-[2.5rem] gradient-card shadow-warm border border-border/25 flex items-center justify-center p-6 backdrop-blur-sm ring-1 ring-white/10">
           <img
             src={logo}
             alt="กรุ๊งกริ๊ง ทอดกรอบ"
             loading="eager"
             decoding="async"
-            className="w-full h-full object-contain drop-shadow-lg"
+            className="w-full h-full object-contain drop-shadow-xl"
           />
         </div>
       </motion.div>
@@ -56,7 +57,7 @@ const Hero = () => {
         transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="text-center mt-7 space-y-2"
       >
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-foreground tracking-tight leading-[1.08]">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-foreground tracking-tight leading-[1.08] drop-shadow-sm">
           <span className="text-foreground/90">
             กรุ๊งกริ๊ง{" "}
           </span>
@@ -64,7 +65,7 @@ const Hero = () => {
             ทอดกรอบ
           </span>
         </h1>
-        <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-normal max-w-md mx-auto leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg text-muted-foreground/90 font-normal max-w-md mx-auto leading-relaxed">
           อาหารสด • แปรรูป • แช่แข็ง • อร่อยทุกคำ สดใหม่ทุกวัน
         </p>
       </motion.div>
@@ -74,7 +75,7 @@ const Hero = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        className="mt-7 gradient-warm text-primary-foreground px-7 py-2.5 rounded-full font-semibold text-sm sm:text-base shadow-warm cursor-pointer inline-flex items-center gap-2 ring-1 ring-white/25"
+        className="mt-7 gradient-warm text-primary-foreground px-7 py-2.5 rounded-full font-semibold text-sm sm:text-base shadow-warm cursor-pointer inline-flex items-center gap-2 ring-1 ring-white/30 hover:ring-white/40"
       >
         ดูสินค้าทั้งหมด
         <ChevronDown className="w-5 h-5" />

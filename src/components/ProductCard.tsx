@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/products";
 import { Flame, Package } from "lucide-react";
@@ -12,7 +13,7 @@ interface ProductCardProps {
   highPriorityImage?: boolean;
 }
 
-const ProductCard = ({ product, index, enableAddToCart = false, highPriorityImage = false }: ProductCardProps) => {
+const ProductCard = React.memo(function ProductCard({ product, index, enableAddToCart = false, highPriorityImage = false }: ProductCardProps) {
   const handleAddToCart = () => {
     try {
       const key = "sunny_cart_v2";
@@ -95,6 +96,6 @@ const ProductCard = ({ product, index, enableAddToCart = false, highPriorityImag
       </div>
     </motion.div>
   );
-};
+});
 
 export default ProductCard;
