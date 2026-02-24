@@ -12,52 +12,16 @@ export interface Product {
 const STORAGE_KEY = 'krungkring_products';
 const CATEGORIES_KEY = 'krungkring_categories';
 
-const defaultCategories: string[] = ['ของทอด', 'กุ้ง', 'ไก่', 'อื่นๆ'];
-
-const defaultProducts: Product[] = [
-  {
-    id: '1',
-    name: 'ปอเปี๊ยะทอดกรอบ',
-    image: '',
-    retailPrice: 59,
-    wholesalePrice: 45,
-    minWholesaleQty: 10,
-    description: 'ปอเปี๊ยะทอดกรอบ ไส้แน่น อร่อยสดใหม่ทุกวัน',
-    category: 'ของทอด',
-  },
-  {
-    id: '2',
-    name: 'ไก่ทอดกรอบ',
-    image: '',
-    retailPrice: 79,
-    wholesalePrice: 60,
-    minWholesaleQty: 10,
-    description: 'ไก่ทอดกรอบนอกนุ่มใน หอมเครื่องเทศ',
-    category: 'ไก่',
-  },
-  {
-    id: '3',
-    name: 'กุ้งทอดกรอบ',
-    image: '',
-    retailPrice: 99,
-    wholesalePrice: 75,
-    minWholesaleQty: 10,
-    description: 'กุ้งทอดกรอบ ตัวใหญ่ เนื้อแน่น',
-    category: 'กุ้ง',
-  },
-];
-
 export function getProducts(): Product[] {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     try {
       return JSON.parse(stored);
     } catch {
-      return defaultProducts;
+      return [];
     }
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
-  return defaultProducts;
+  return [];
 }
 
 export function saveProducts(products: Product[]) {
@@ -89,11 +53,10 @@ export function getCategories(): string[] {
     try {
       return JSON.parse(stored);
     } catch {
-      return defaultCategories;
+      return [];
     }
   }
-  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(defaultCategories));
-  return defaultCategories;
+  return [];
 }
 
 export function saveCategories(categories: string[]) {

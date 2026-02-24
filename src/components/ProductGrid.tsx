@@ -98,10 +98,15 @@ const ProductGrid = () => {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-          {[...Array(10)].map((_, i) => (
-            <ProductCardSkeleton key={i} />
-          ))}
+        <div className="space-y-4">
+          <p className="text-center text-muted-foreground text-sm">
+            กำลังโหลดข้อมูลสินค้า...
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            {[...Array(10)].map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
       ) : filtered.length === 0 ? (
         <p className="text-center text-muted-foreground py-16 text-lg">
