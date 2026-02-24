@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { DataService, type Product } from "@/lib/data-service";
 import ProductCard from "./ProductCard";
+import ProductCardSkeleton from "./ProductCardSkeleton";
 import { motion } from "framer-motion";
 
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
@@ -19,6 +21,8 @@ const ProductGrid = () => {
         setCategories(categoriesData);
       } catch (error) {
         console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
     };
     
@@ -78,7 +82,13 @@ const ProductGrid = () => {
         </motion.div>
       )}
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <p className="text-center text-muted-foreground py-16 text-lg">
           ยังไม่มีสินค้า{activeCategory ? ` ในหมวด "${activeCategory}"` : ""}
         </p>
