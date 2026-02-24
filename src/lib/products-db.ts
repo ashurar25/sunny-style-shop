@@ -7,11 +7,10 @@ export function getProducts(): Product[] {
     try {
       return JSON.parse(stored);
     } catch {
-      return getDefaultProducts();
+      return [];
     }
   }
-  localStorage.setItem('krungkring_products', JSON.stringify(getDefaultProducts()));
-  return getDefaultProducts();
+  return [];
 }
 
 export function saveProducts(products: Product[]) {
@@ -42,11 +41,10 @@ export function getCategories(): string[] {
     try {
       return JSON.parse(stored);
     } catch {
-      return getDefaultCategories();
+      return [];
     }
   }
-  localStorage.setItem('krungkring_categories', JSON.stringify(getDefaultCategories()));
-  return getDefaultCategories();
+  return [];
 }
 
 export function saveCategories(categories: string[]) {
@@ -68,42 +66,4 @@ export function deleteCategory(name: string): string[] {
   return categories;
 }
 
-// Default data
-function getDefaultCategories(): string[] {
-  return ['ของทอด', 'กุ้ง', 'ไก่', 'อื่นๆ'];
-}
 
-function getDefaultProducts(): Product[] {
-  return [
-    {
-      id: '1',
-      name: 'ปอเปี๊ยะทอดกรอบ',
-      image: '',
-      retailPrice: 59,
-      wholesalePrice: 45,
-      minWholesaleQty: 10,
-      description: 'ปอเปี๊ยะทอดกรอบ ไส้แน่น อร่อยสดใหม่ทุกวัน',
-      category: 'ของทอด',
-    },
-    {
-      id: '2',
-      name: 'ไก่ทอดกรอบ',
-      image: '',
-      retailPrice: 79,
-      wholesalePrice: 60,
-      minWholesaleQty: 10,
-      description: 'ไก่ทอดกรอบนอกนุ่มใน หอมเครื่องเทศ',
-      category: 'ไก่',
-    },
-    {
-      id: '3',
-      name: 'กุ้งทอดกรอบ',
-      image: '',
-      retailPrice: 99,
-      wholesalePrice: 75,
-      minWholesaleQty: 10,
-      description: 'กุ้งทอดกรอบ ตัวใหญ่ เนื้อแน่น',
-      category: 'กุ้ง',
-    },
-  ];
-}

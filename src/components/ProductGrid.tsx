@@ -3,12 +3,14 @@ import { DataService, type Product } from "@/lib/data-service";
 import ProductCard from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
 
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -29,9 +31,13 @@ const ProductGrid = () => {
     loadData();
   }, []);
 
-  const filtered = activeCategory
-    ? products.filter(p => p.category === activeCategory)
-    : products;
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const filtered = products.filter((p) => {
+    if (activeCategory && p.category !== activeCategory) return false;
+    if (!normalizedQuery) return true;
+    return (p.name || "").toLowerCase().includes(normalizedQuery);
+  });
 
   return (
     <section id="products" className="py-10 px-4 max-w-6xl mx-auto">
@@ -82,18 +88,29 @@ const ProductGrid = () => {
         </motion.div>
       )}
 
+      {/* Search */}
+      <div className="max-w-xl mx-auto mb-6">
+        <Input
+          placeholder="ค้นหาสินค้า..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          {[...Array(10)].map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <p className="text-center text-muted-foreground py-16 text-lg">
-          ยังไม่มีสินค้า{activeCategory ? ` ในหมวด "${activeCategory}"` : ""}
+          {normalizedQuery
+            ? `ไม่พบสินค้า${activeCategory ? ` ในหมวด "${activeCategory}"` : ""} ที่ตรงกับ "${query.trim()}"`
+            : `ยังไม่มีสินค้า${activeCategory ? ` ในหมวด "${activeCategory}"` : ""}`}
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {filtered.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} enableAddToCart />
           ))}
