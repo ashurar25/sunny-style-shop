@@ -31,11 +31,11 @@ const ProductGrid = () => {
     };
     
     loadData();
+  }, []);
+
   useEffect(() => {
     setVisibleCount(20);
   }, [activeCategory, query]);
-
-  }, []);
 
   const normalizedQuery = query.trim().toLowerCase();
 
