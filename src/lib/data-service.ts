@@ -35,6 +35,22 @@ function withTimeout<T>(promise: Promise<T>, ms: number) {
   });
 }
 
+function trySaveProductsToLocalStorage(products: Product[]) {
+  try {
+    localStorageFunctions.saveProducts(products);
+  } catch (e) {
+    console.warn('[DataService] localStorage saveProducts failed', e);
+  }
+}
+
+function trySaveCategoriesToLocalStorage(categories: string[]) {
+  try {
+    localStorageFunctions.saveCategories(categories);
+  } catch (e) {
+    console.warn('[DataService] localStorage saveCategories failed', e);
+  }
+}
+
 function isCacheFresh(timestamp: number) {
   return Date.now() - timestamp < CACHE_TTL;
 }
@@ -72,13 +88,13 @@ export class DataService {
       // Try Cloud first (faster, same region)
       const data = await withTimeout(cloudDb.getProductsFromCloud(), DB_FETCH_TIMEOUT_MS);
       cache.products = { data, timestamp: Date.now() };
-      localStorageFunctions.saveProducts(data);
+      trySaveProductsToLocalStorage(data);
       return data;
     } catch {
       try {
         const data = await withTimeout(neonDb.getProductsFromDB(), DB_FETCH_TIMEOUT_MS);
         cache.products = { data, timestamp: Date.now() };
-        localStorageFunctions.saveProducts(data);
+        trySaveProductsToLocalStorage(data);
         return data;
       } catch {
         const data = localStorageFunctions.getProducts();
@@ -104,13 +120,13 @@ export class DataService {
     try {
       const data = await withTimeout(cloudDb.getCategoriesFromCloud(), DB_FETCH_TIMEOUT_MS);
       cache.categories = { data, timestamp: Date.now() };
-      localStorageFunctions.saveCategories(data);
+      trySaveCategoriesToLocalStorage(data);
       return data;
     } catch {
       try {
         const data = await withTimeout(neonDb.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS);
         cache.categories = { data, timestamp: Date.now() };
-        localStorageFunctions.saveCategories(data);
+        trySaveCategoriesToLocalStorage(data);
         return data;
       } catch {
         const data = localStorageFunctions.getCategories();
@@ -126,7 +142,7 @@ export class DataService {
       const data = await retryOnce(() => withTimeout(cloudDb.getProductsFromCloud(), DB_FETCH_TIMEOUT_MS));
       console.log('[DataService] getProductsFromDBOnly: cloud', { count: data.length });
       cache.products = { data, timestamp: Date.now() };
-      localStorageFunctions.saveProducts(data);
+      trySaveProductsToLocalStorage(data);
       return data;
     } catch (e) {
       console.warn('[DataService] getProductsFromDBOnly: cloud failed', e);
@@ -134,7 +150,7 @@ export class DataService {
         const data = await retryOnce(() => withTimeout(neonDb.getProductsFromDB(), DB_FETCH_TIMEOUT_MS));
         console.log('[DataService] getProductsFromDBOnly: neon', { count: data.length });
         cache.products = { data, timestamp: Date.now() };
-        localStorageFunctions.saveProducts(data);
+        trySaveProductsToLocalStorage(data);
         return data;
       } catch (e2) {
         console.warn('[DataService] getProductsFromDBOnly: neon failed', e2);
@@ -149,7 +165,7 @@ export class DataService {
       const data = await retryOnce(() => withTimeout(cloudDb.getCategoriesFromCloud(), DB_FETCH_TIMEOUT_MS));
       console.log('[DataService] getCategoriesFromDBOnly: cloud', { count: data.length });
       cache.categories = { data, timestamp: Date.now() };
-      localStorageFunctions.saveCategories(data);
+      trySaveCategoriesToLocalStorage(data);
       return data;
     } catch (e) {
       console.warn('[DataService] getCategoriesFromDBOnly: cloud failed', e);
@@ -157,7 +173,7 @@ export class DataService {
         const data = await retryOnce(() => withTimeout(neonDb.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS));
         console.log('[DataService] getCategoriesFromDBOnly: neon', { count: data.length });
         cache.categories = { data, timestamp: Date.now() };
-        localStorageFunctions.saveCategories(data);
+        trySaveCategoriesToLocalStorage(data);
         return data;
       } catch (e2) {
         console.warn('[DataService] getCategoriesFromDBOnly: neon failed', e2);
