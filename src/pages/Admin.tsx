@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, type ChangeEvent } from "react";
+import { compressImage } from "@/lib/image-compress";
 import { DataService, type Product } from "@/lib/data-service";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2, ImagePlus, Tag, X } from "lucide-react";
@@ -67,14 +68,18 @@ const Admin = () => {
     toast.success("ออกจากระบบแล้ว");
   };
 
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm(f => ({ ...f, image: reader.result as string }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      toast.loading("กำลังบีบอัดรูปภาพ...", { id: "compress" });
+      const compressed = await compressImage(file);
+      setForm(f => ({ ...f, image: compressed }));
+      toast.success("บีบอัดรูปภาพเรียบร้อย", { id: "compress" });
+    } catch (err) {
+      console.error("Image compression failed:", err);
+      toast.error("บีบอัดรูปภาพไม่สำเร็จ", { id: "compress" });
+    }
   };
 
   const handleSave = async () => {
