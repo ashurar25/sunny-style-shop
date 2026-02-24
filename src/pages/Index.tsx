@@ -3,7 +3,6 @@ import ProductGrid from "@/components/ProductGrid";
 import ContactSection from "@/components/ContactSection";
 import { Link } from "react-router-dom";
 import { Settings, ShoppingCart } from "lucide-react";
-import { motion } from "framer-motion";
 
 const ADMIN_AUTH_KEY = "krungkring_admin_authed";
 
@@ -29,33 +28,21 @@ const Index = () => {
 
       {/* FABs */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1, type: "spring" }}
+        <Link
+          to="/order"
+          className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg text-white"
+          title="สั่งซื้อ"
         >
-          <Link
-            to="/order"
-            className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg hover:scale-110 hover:rounded-xl transition-all duration-300 text-white"
-            title="สั่งซื้อ"
-          >
-            <ShoppingCart className="w-6 h-6" />
-          </Link>
-        </motion.div>
+          <ShoppingCart className="w-6 h-6" />
+        </Link>
         {authed && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 1.2, type: "spring" }}
+          <Link
+            to="/admin"
+            className="w-14 h-14 gradient-warm rounded-2xl flex items-center justify-center shadow-warm"
+            title="แอดมิน"
           >
-            <Link
-              to="/admin"
-              className="w-14 h-14 gradient-warm rounded-2xl flex items-center justify-center shadow-warm hover:scale-110 hover:rounded-xl transition-all duration-300"
-              title="แอดมิน"
-            >
-              <Settings className="w-6 h-6 text-primary-foreground" />
-            </Link>
-          </motion.div>
+            <Settings className="w-6 h-6 text-primary-foreground" />
+          </Link>
         )}
       </div>
     </div>

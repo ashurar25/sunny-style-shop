@@ -8,23 +8,19 @@ const Hero = () => {
       {/* Decorative floating shapes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          initial={false}
           className="absolute top-[8%] left-[8%] w-20 h-20 rounded-3xl bg-primary/8 rotate-12"
         />
         <motion.div
-          animate={{ y: [0, 15, 0], x: [0, -8, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          initial={false}
           className="absolute top-[20%] right-[10%] w-16 h-16 rounded-full bg-secondary/15"
         />
         <motion.div
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          initial={false}
           className="absolute bottom-[25%] left-[15%] w-12 h-12 rounded-2xl bg-accent/10 -rotate-12"
         />
         <motion.div
-          animate={{ y: [0, 18, 0], x: [0, -10, 0] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          initial={false}
           className="absolute bottom-[15%] right-[12%] w-24 h-24 rounded-full bg-primary/5"
         />
         {/* Large background blurs */}
@@ -37,7 +33,6 @@ const Hero = () => {
         initial={{ opacity: 0, scale: 0.6, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        whileHover={{ scale: 1.02, rotate: 0.5 }}
         className="relative will-change-transform"
       >
         {/* Glow ring */}
@@ -76,8 +71,6 @@ const Hero = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        whileHover={{ scale: 1.05, y: -2 }}
-        whileTap={{ scale: 0.97 }}
         className="mt-7 gradient-warm text-primary-foreground px-8 py-3 rounded-2xl font-semibold text-base shadow-warm cursor-pointer flex items-center gap-2"
       >
         ดูสินค้าทั้งหมด
