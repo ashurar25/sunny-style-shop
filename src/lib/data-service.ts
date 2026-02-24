@@ -114,13 +114,41 @@ export class DataService {
 
   // DB-only fetchers (no cache, no localStorage read). Useful for pages that must always load from DB.
   static async getProductsFromDBOnly(): Promise<Product[]> {
-    const data = await DataService._fetchProducts();
-    return data;
+    try {
+      const data = await withTimeout(cloudDb.getProductsFromCloud(), DB_FETCH_TIMEOUT_MS);
+      cache.products = { data, timestamp: Date.now() };
+      localStorageFunctions.saveProducts(data);
+      return data;
+    } catch {
+      try {
+        const data = await withTimeout(neonDb.getProductsFromDB(), DB_FETCH_TIMEOUT_MS);
+        cache.products = { data, timestamp: Date.now() };
+        localStorageFunctions.saveProducts(data);
+        return data;
+      } catch {
+        cache.products = { data: [], timestamp: Date.now() };
+        return [];
+      }
+    }
   }
 
   static async getCategoriesFromDBOnly(): Promise<string[]> {
-    const data = await DataService._fetchCategories();
-    return data;
+    try {
+      const data = await withTimeout(cloudDb.getCategoriesFromCloud(), DB_FETCH_TIMEOUT_MS);
+      cache.categories = { data, timestamp: Date.now() };
+      localStorageFunctions.saveCategories(data);
+      return data;
+    } catch {
+      try {
+        const data = await withTimeout(neonDb.getCategoriesFromDB(), DB_FETCH_TIMEOUT_MS);
+        cache.categories = { data, timestamp: Date.now() };
+        localStorageFunctions.saveCategories(data);
+        return data;
+      } catch {
+        cache.categories = { data: [], timestamp: Date.now() };
+        return [];
+      }
+    }
   }
 
   private static _invalidateCache() {
