@@ -37,7 +37,23 @@ function withTimeout<T>(promise: Promise<T>, ms: number) {
 
 function trySaveProductsToLocalStorage(products: Product[]) {
   try {
-    localStorageFunctions.saveProducts(products);
+    const existing = localStorageFunctions.getProducts();
+    const weightById = new Map<string, number>();
+    for (const p of existing) {
+      if (p?.id && p.weightKg !== undefined && p.weightKg !== null) {
+        weightById.set(p.id, Number(p.weightKg));
+      }
+    }
+
+    const merged = products.map((p) => {
+      if (!p?.id) return p;
+      if (p.weightKg !== undefined && p.weightKg !== null) return p;
+      const prev = weightById.get(p.id);
+      if (prev === undefined) return p;
+      return { ...p, weightKg: prev };
+    });
+
+    localStorageFunctions.saveProducts(merged);
   } catch (e) {
     console.warn('[DataService] localStorage saveProducts failed', e);
   }
