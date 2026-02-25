@@ -332,25 +332,20 @@ const Order = () => {
       return;
     }
 
-    const popup = window.open("about:blank", "_blank", "noopener,noreferrer");
-    if (!popup) {
-      toast.error("เบราว์เซอร์บล็อกหน้าต่างใหม่ กรุณาอนุญาต Pop-up แล้วลองอีกครั้ง");
-      return;
-    }
-
     const summary = generateOrderSummary();
     const message = `📸 ใบเสร็จการสั่งซื้อ\n\n${summary}\n\n🖼️ รูปใบเสร็จ:`;
     const encoded = encodeURIComponent(message);
     const fbUrl = `https://www.facebook.com/Kenginol.ar/messages/?text=${encoded}`;
 
-    try {
-      popup.location.href = fbUrl;
-      toast.success("เปิดหน้า Facebook แล้ว");
-    } catch (e) {
-      console.error(e);
-      popup.close();
-      toast.error("เปิดหน้า Facebook ไม่สำเร็จ");
-    }
+    // Use a temporary <a> element to avoid popup blockers
+    const a = document.createElement("a");
+    a.href = fbUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast.success("เปิดหน้า Facebook แล้ว");
 
     // Best-effort: copy the message so user can paste if FB doesn't prefill.
     void navigator.clipboard
