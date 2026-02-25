@@ -22,7 +22,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-10 text-center border-t border-border bg-card/50">
         <p className="text-sm text-muted-foreground">
-          © 2025 กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป
+          © 2025 กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป By ASHURA Coding
         </p>
       </footer>
 
