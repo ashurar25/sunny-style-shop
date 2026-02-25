@@ -147,7 +147,7 @@ const Admin = () => {
     try {
       await DataService.updateProduct(product.id, {
         pinned: !isPinned,
-        pinnedAt: !isPinned ? Date.now() : undefined,
+        pinnedAt: !isPinned ? Date.now() : (null as any),
       });
       setProducts(await DataService.getProducts());
       toast.success(!isPinned ? "ปักหมุดแล้ว" : "ถอนหมุดแล้ว");

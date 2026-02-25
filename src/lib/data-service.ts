@@ -224,11 +224,25 @@ export class DataService {
   }
 
   static async updateProduct(id: string, updates: Partial<Product>): Promise<void> {
-    await Promise.allSettled([
-      neonDb.updateProductInDB(id, updates).catch(e => console.warn('Neon update error:', e)),
-      cloudDb.updateProductInCloud(id, updates).catch(e => console.warn('Cloud update error:', e)),
-    ]);
-    localStorageFunctions.updateProduct(id, updates);
+    const normalizedUpdates: Partial<Product> = { ...updates };
+    // Important: when unpinning, we must clear pinnedAt in DB (set to null).
+    if (normalizedUpdates.pinned === false && normalizedUpdates.pinnedAt === undefined) {
+      (normalizedUpdates as any).pinnedAt = null;
+    }
+
+    // Cloud is authoritative for the deployed app. If cloud update fails, we must surface the error.
+    await cloudDb.updateProductInCloud(id, normalizedUpdates);
+
+    // Neon is best-effort (don't block UI if it fails).
+    neonDb.updateProductInDB(id, normalizedUpdates).catch((e) => console.warn('Neon update error:', e));
+
+    // Local storage is best-effort fallback.
+    try {
+      localStorageFunctions.updateProduct(id, normalizedUpdates);
+    } catch (e) {
+      console.warn('[DataService] localStorage updateProduct failed', e);
+    }
+
     DataService._invalidateCache();
   }
 
