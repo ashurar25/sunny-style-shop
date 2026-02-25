@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Minus, Trash2, Facebook, Image } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Trash2, Facebook, Image, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { DataService, type Product } from "@/lib/data-service";
 
 interface CartItem extends Product {
@@ -326,34 +326,62 @@ const Order = () => {
     a.remove();
   };
 
-  const handleSendReceiptToFacebook = () => {
+  const copyReceiptMessageBestEffort = async (message: string) => {
+    try {
+      await navigator.clipboard?.writeText(message);
+      toast.success("คัดลอกข้อความใบเสร็จแล้ว (วางในแชทได้เลย)");
+    } catch {
+      // ignore
+    }
+  };
+
+  const openExternalBestEffort = (url: string) => {
+    // Use window.open in direct click handler to avoid iframe/proxy issues
+    // and reduce popup-blocker chances.
+    try {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch {
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
+  const buildReceiptMessage = () => {
+    const summary = generateOrderSummary();
+    return `📸 ใบเสร็จการสั่งซื้อ\n\n${summary}\n\n🖼️ แนบรูปใบเสร็จที่บันทึกไว้ (ไฟล์ receipt.png)`;
+  };
+
+  const handleSendReceiptToFacebook = async () => {
     if (!receiptImage) {
       toast.error("กรุณาจับภาพใบเสร็จก่อน");
       return;
     }
 
-    const summary = generateOrderSummary();
-    const message = `📸 ใบเสร็จการสั่งซื้อ\n\n${summary}\n\n🖼️ รูปใบเสร็จ:`;
-    const encoded = encodeURIComponent(message);
-    const fbUrl = `https://www.facebook.com/Kenginol.ar/messages/?text=${encoded}`;
+    const message = buildReceiptMessage();
+    // Note: Facebook does not reliably support pre-filling message text via URL.
+    // Best UX: open chat and auto-copy text for paste.
+    const messengerUrl = "https://m.me/Kenginol.ar";
+    openExternalBestEffort(messengerUrl);
+    toast.success("เปิด Messenger แล้ว");
+    await copyReceiptMessageBestEffort(message);
+  };
 
-    // Use a temporary <a> element to avoid popup blockers
-    const a = document.createElement("a");
-    a.href = fbUrl;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    toast.success("เปิดหน้า Facebook แล้ว");
+  const handleSendReceiptToLine = async () => {
+    if (!receiptImage) {
+      toast.error("กรุณาจับภาพใบเสร็จก่อน");
+      return;
+    }
 
-    // Best-effort: copy the message so user can paste if FB doesn't prefill.
-    void navigator.clipboard
-      ?.writeText(message)
-      .then(() => toast.success("คัดลอกข้อความใบเสร็จแล้ว (วางในแชทได้เลย)"))
-      .catch(() => {
-        // ignore
-      });
+    const message = buildReceiptMessage();
+    const lineUrl = "https://line.me/ti/p/o6v8FE_0QN";
+    openExternalBestEffort(lineUrl);
+    toast.success("เปิด Line แล้ว");
+    await copyReceiptMessageBestEffort(message);
   };
 
   return (
@@ -489,8 +517,20 @@ const Order = () => {
                 <Button variant="outline" onClick={() => setReceiptImage(null)} className="flex-1">
                   ลบใบเสร็จ
                 </Button>
-                <Button onClick={handleSendReceiptToFacebook} className="gradient-warm text-primary-foreground flex-1">
-                  <Facebook className="w-4 h-4 mr-1" /> ส่งรูปไป Facebook
+                <Button
+                  variant="outline"
+                  onClick={handleSendReceiptToLine}
+                  className="flex-1"
+                  title="เปิด Line แล้ววางข้อความ และแนบรูปใบเสร็จ"
+                >
+                  <MessageCircle className="w-4 h-4 mr-1" /> ส่งไป Line
+                </Button>
+                <Button
+                  onClick={handleSendReceiptToFacebook}
+                  className="gradient-warm text-primary-foreground flex-1"
+                  title="เปิด Messenger แล้ววางข้อความ และแนบรูปใบเสร็จ"
+                >
+                  <Facebook className="w-4 h-4 mr-1" /> ส่งไป Facebook
                 </Button>
               </div>
             </div>
