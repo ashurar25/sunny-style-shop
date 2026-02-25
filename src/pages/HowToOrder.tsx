@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, MessageCircle, Facebook, Copy } from "lucide-react";
+import { ArrowLeft, MessageCircle, Facebook, Copy, ShoppingCart, Home } from "lucide-react";
 
 const LINE_URL = "https://line.me/ti/p/o6v8FE_0QN";
 const FACEBOOK_PAGE_URL = "https://www.facebook.com/krungkringtodkrob";
@@ -149,6 +149,41 @@ const HowToOrder = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        <section className="glass rounded-2xl p-6 border border-border">
+          <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
+            <div>
+              <div className="text-sm font-semibold text-primary tracking-widest uppercase">เริ่มต้น</div>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mt-1">เพิ่มสินค้าเข้าตะกร้า</h2>
+              <p className="text-muted-foreground mt-2">
+                เลือกสินค้าที่ต้องการ แล้วกด “เพิ่มลงตะกร้า” จากนั้นกดปุ่มตะกร้ามุมขวาล่างเพื่อไปหน้าสั่งซื้อ
+              </p>
+            </div>
+            <div className="flex gap-2 w-full md:w-auto">
+              <Link to="/">
+                <Button variant="outline" className="w-full md:w-auto">
+                  <Home className="w-4 h-4 mr-1" /> ไปหน้าแรก
+                </Button>
+              </Link>
+              <Link to="/order">
+                <Button className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-600/90 text-white">
+                  <ShoppingCart className="w-4 h-4 mr-1" /> ไปหน้าตะกร้า
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <StepIllustration
+              title="เพิ่มสินค้าเข้าตะกร้า"
+              steps={[
+                "เลื่อนดูสินค้า หรือค้นหาชื่อสินค้า",
+                "กดปุ่ม เพิ่มลงตะกร้า ที่การ์ดสินค้า",
+                "กดไอคอนตะกร้ามุมขวาล่าง ไปหน้าสั่งซื้อ",
+              ]}
+            />
+          </div>
+        </section>
+
         <section className="glass rounded-2xl p-6 border border-border">
           <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
             <div>
