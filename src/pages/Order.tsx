@@ -66,6 +66,25 @@ const Order = () => {
 
   const CART_STORAGE_KEY_V2 = "sunny_cart_v2";
   const CART_STORAGE_KEY_V1 = "sunny_cart";
+  const CUSTOMER_STORAGE_KEY = "sunny_customer_info_v1";
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CUSTOMER_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return;
+      setCustomerInfo((s) => ({
+        ...s,
+        name: typeof (parsed as any).name === "string" ? (parsed as any).name : s.name,
+        phone: typeof (parsed as any).phone === "string" ? (parsed as any).phone : s.phone,
+        address: typeof (parsed as any).address === "string" ? (parsed as any).address : s.address,
+        note: typeof (parsed as any).note === "string" ? (parsed as any).note : s.note,
+      }));
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     const savedV2 = localStorage.getItem(CART_STORAGE_KEY_V2);
@@ -125,10 +144,20 @@ const Order = () => {
     const minimal: StoredCartItem[] = cart.map((i) => ({ id: i.id, quantity: i.quantity }));
     try {
       localStorage.setItem(CART_STORAGE_KEY_V2, JSON.stringify(minimal));
+      // same-tab listeners won't receive the 'storage' event, so dispatch a custom event
+      window.dispatchEvent(new Event("sunny-cart-updated"));
     } catch (e) {
       console.error(e);
     }
   }, [cart]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customerInfo));
+    } catch {
+      // ignore
+    }
+  }, [customerInfo]);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -356,6 +385,16 @@ const Order = () => {
     return `📸 ใบเสร็จการสั่งซื้อ\n\n${summary}\n\n🖼️ แนบรูปใบเสร็จที่บันทึกไว้ (ไฟล์ receipt.png)`;
   };
 
+  const handleCopyReceiptMessage = async () => {
+    const message = buildReceiptMessage();
+    try {
+      await navigator.clipboard?.writeText(message);
+      toast.success("คัดลอกข้อความแล้ว");
+    } catch {
+      toast.error("คัดลอกไม่สำเร็จ ลองคัดลอกด้วยตนเอง");
+    }
+  };
+
   const handleSendReceiptToFacebook = async () => {
     if (!receiptImage) {
       toast.error("กรุณาจับภาพใบเสร็จก่อน");
@@ -512,6 +551,14 @@ const Order = () => {
                   alt="ใบเสร็จ"
                   className="w-full max-w-[360px] mx-auto rounded-md"
                 />
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" onClick={handleCopyReceiptMessage} className="flex-1">
+                  คัดลอกข้อความสรุป
+                </Button>
+                <Button variant="outline" onClick={handleDownloadReceipt} className="flex-1">
+                  บันทึกใบเสร็จ
+                </Button>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setReceiptImage(null)} className="flex-1">
