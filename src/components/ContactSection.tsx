@@ -21,8 +21,8 @@ const contacts = [
   {
     icon: Facebook,
     label: "Facebook",
-    value: "kenginol.ar",
-    href: "https://www.messenger.com/t/Kenginol.ar",
+    value: "krungkringtodkrob",
+    href: "https://www.facebook.com/krungkringtodkrob",
     gradient: "from-blue-500/15 to-blue-500/5",
     iconColor: "text-blue-600",
   },

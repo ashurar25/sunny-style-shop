@@ -19,9 +19,10 @@ const formatTHB = (amount: number) => {
 
 const MESSENGER_CHAT_URLS = [
   // messenger.com is often less restricted than facebook.com in some environments
-  // For personal profiles, messenger.com thread URL is more reliable than m.me.
-  "https://www.messenger.com/t/Kenginol.ar",
-  "https://www.messenger.com/t/krungkriing",
+  // Official Facebook Page: https://www.facebook.com/krungkringtodkrob
+  // Prefer m.me for page chat, fallback to messenger.com thread.
+  "https://m.me/krungkringtodkrob",
+  "https://www.messenger.com/t/krungkringtodkrob",
 ];
 
 type StoredCartItem = { id: string; quantity: number };
