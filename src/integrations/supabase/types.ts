@@ -41,6 +41,8 @@ export type Database = {
           image: string | null
           min_wholesale_qty: number
           name: string
+          pinned: boolean
+          pinned_at: number | null
           retail_price: number
           updated_at: string
           wholesale_price: number
@@ -53,6 +55,8 @@ export type Database = {
           image?: string | null
           min_wholesale_qty: number
           name: string
+          pinned?: boolean
+          pinned_at?: number | null
           retail_price: number
           updated_at?: string
           wholesale_price: number
@@ -65,6 +69,8 @@ export type Database = {
           image?: string | null
           min_wholesale_qty?: number
           name?: string
+          pinned?: boolean
+          pinned_at?: number | null
           retail_price?: number
           updated_at?: string
           wholesale_price?: number
