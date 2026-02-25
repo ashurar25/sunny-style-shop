@@ -17,12 +17,17 @@ const formatTHB = (amount: number) => {
   return `฿${safe.toLocaleString("th-TH")}`;
 };
 
+const FACEBOOK_PAGE_URL = "https://www.facebook.com/krungkringtodkrob";
+const MESSENGER_PAGE_URLS = [
+  "https://m.me/krungkringtodkrob",
+  "https://www.messenger.com/t/krungkringtodkrob",
+];
+
 const MESSENGER_CHAT_URLS = [
   // messenger.com is often less restricted than facebook.com in some environments
   // Official Facebook Page: https://www.facebook.com/krungkringtodkrob
   // Prefer m.me for page chat, fallback to messenger.com thread.
-  "https://m.me/krungkringtodkrob",
-  "https://www.messenger.com/t/krungkringtodkrob",
+  ...MESSENGER_PAGE_URLS,
 ];
 
 type StoredCartItem = { id: string; quantity: number };
@@ -446,6 +451,15 @@ const Order = () => {
     }
   };
 
+  const handleCopyFacebookPageLink = async () => {
+    try {
+      await navigator.clipboard?.writeText(FACEBOOK_PAGE_URL);
+      toast.success("คัดลอกลิงก์เพจ Facebook แล้ว");
+    } catch {
+      toast.error("คัดลอกลิงก์ไม่สำเร็จ");
+    }
+  };
+
   const handleSendReceiptToLine = async () => {
     if (!receiptImage) {
       toast.error("กรุณาจับภาพใบเสร็จก่อน");
@@ -595,9 +609,15 @@ const Order = () => {
                 <Button variant="outline" onClick={handleCopyMessengerLink} className="flex-1">
                   คัดลอกลิงก์ Messenger
                 </Button>
+                <Button variant="outline" onClick={handleCopyFacebookPageLink} className="flex-1">
+                  คัดลอกลิงก์เพจ Facebook
+                </Button>
                 <Button variant="outline" onClick={handleDownloadReceipt} className="flex-1">
                   บันทึกใบเสร็จ
                 </Button>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                ถ้า Facebook/Messenger เปิดไม่ได้ในอุปกรณ์ของคุณ ให้ใช้ Line เป็นช่องทางหลัก (แนะนำ)
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setReceiptImage(null)} className="flex-1">
