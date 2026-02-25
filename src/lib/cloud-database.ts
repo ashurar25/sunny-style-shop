@@ -3,6 +3,11 @@ import type { Product } from './products';
 
 // Cloud (Supabase) database functions
 
+function isMissingColumnError(error: any, column: string) {
+  const msg = String(error?.message ?? error ?? "");
+  return msg.toLowerCase().includes("column") && msg.toLowerCase().includes(column.toLowerCase()) && msg.toLowerCase().includes("does not exist");
+}
+
 export async function getProductsFromCloud(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
@@ -26,6 +31,7 @@ export async function getProductsFromCloud(): Promise<Product[]> {
     retailPrice: Number(row.retail_price),
     wholesalePrice: Number(row.wholesale_price),
     minWholesaleQty: Number(row.min_wholesale_qty),
+    weightKg: row.weight_kg !== undefined && row.weight_kg !== null ? Number(row.weight_kg) : undefined,
     description: row.description || '',
     category: row.category || '',
     pinned: !!row.pinned,
@@ -35,18 +41,24 @@ export async function getProductsFromCloud(): Promise<Product[]> {
 
 export async function addProductToCloud(product: Omit<Product, 'id'>): Promise<Product> {
   const id = Date.now().toString();
-  const { error } = await supabase.from('products').insert({
+  const payload: Record<string, any> = {
     id,
     name: product.name,
     image: product.image,
     retail_price: product.retailPrice,
     wholesale_price: product.wholesalePrice,
     min_wholesale_qty: product.minWholesaleQty,
+    weight_kg: product.weightKg ?? null,
     description: product.description,
     category: product.category,
     pinned: !!product.pinned,
     pinned_at: product.pinnedAt ?? null,
-  });
+  };
+  let { error } = await supabase.from('products').insert(payload);
+  if (error && isMissingColumnError(error, 'weight_kg')) {
+    delete payload.weight_kg;
+    ({ error } = await supabase.from('products').insert(payload));
+  }
   if (error) throw error;
   return { ...product, id };
 }
@@ -63,13 +75,18 @@ export async function updateProductInCloud(id: string, updates: Partial<Product>
   if (updates.retailPrice !== undefined) mapped.retail_price = updates.retailPrice;
   if (updates.wholesalePrice !== undefined) mapped.wholesale_price = updates.wholesalePrice;
   if (updates.minWholesaleQty !== undefined) mapped.min_wholesale_qty = updates.minWholesaleQty;
+  if (updates.weightKg !== undefined) mapped.weight_kg = updates.weightKg ?? null;
   if (updates.description !== undefined) mapped.description = updates.description;
   if (updates.category !== undefined) mapped.category = updates.category;
   if (updates.pinned !== undefined) mapped.pinned = !!updates.pinned;
   if (updates.pinnedAt !== undefined) mapped.pinned_at = updates.pinnedAt ?? null;
   mapped.updated_at = new Date().toISOString();
 
-  const { error } = await supabase.from('products').update(mapped).eq('id', id);
+  let { error } = await supabase.from('products').update(mapped).eq('id', id);
+  if (error && isMissingColumnError(error, 'weight_kg')) {
+    delete mapped.weight_kg;
+    ({ error } = await supabase.from('products').update(mapped).eq('id', id));
+  }
   if (error) throw error;
 }
 
@@ -83,12 +100,20 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
     retail_price: p.retailPrice,
     wholesale_price: p.wholesalePrice,
     min_wholesale_qty: p.minWholesaleQty,
+    weight_kg: p.weightKg ?? null,
     description: p.description,
     category: p.category,
     pinned: !!p.pinned,
     pinned_at: p.pinnedAt ?? null,
   }));
-  const { error } = await supabase.from('products').insert(rows);
+  let { error } = await supabase.from('products').insert(rows);
+  if (error && isMissingColumnError(error, 'weight_kg')) {
+    const rowsWithoutWeight = rows.map((r) => {
+      const { weight_kg, ...rest } = r as any;
+      return rest;
+    });
+    ({ error } = await supabase.from('products').insert(rowsWithoutWeight));
+  }
   if (error) throw error;
 }
 

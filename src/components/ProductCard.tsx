@@ -74,6 +74,12 @@ const ProductCard = React.memo(function ProductCard({ product, index, enableAddT
         {product.description && (
           <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{product.description}</p>
         )}
+
+        {product.weightKg !== undefined && product.weightKg !== null && product.weightKg > 0 && (
+          <div className="text-[11px] text-muted-foreground">
+            น้ำหนัก {product.weightKg} กก.
+          </div>
+        )}
         
         <div className="space-y-1.5 pt-0.5">
           <div className="flex items-baseline justify-between">

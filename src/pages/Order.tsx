@@ -17,6 +17,11 @@ const formatTHB = (amount: number) => {
   return `฿${safe.toLocaleString("th-TH")}`;
 };
 
+const formatKg = (kg: number) => {
+  const safe = Number.isFinite(kg) ? kg : 0;
+  return `${safe % 1 === 0 ? safe.toFixed(0) : safe.toFixed(2)} กก.`;
+};
+
 const FACEBOOK_PAGE_URL = "https://www.facebook.com/krungkringtodkrob";
 const MESSENGER_PAGE_URLS = [
   "https://m.me/krungkringtodkrob",
@@ -244,6 +249,28 @@ const Order = () => {
     );
   };
 
+  const getTotalWeightKg = () => {
+    return cart.reduce((sum, item) => {
+      const w = item.weightKg ?? 0;
+      return sum + Number(w) * item.quantity;
+    }, 0);
+  };
+
+  const getShippingAndPackaging = () => {
+    const totalWeight = getTotalWeightKg();
+    if (totalWeight <= 0) {
+      return { totalWeightKg: 0, foamBoxLabel: "-", foamBoxFee: 0, shippingFee: 0, extraFee: 0 };
+    }
+    if (totalWeight < 20) {
+      const foamBoxFee = 60;
+      const shippingFee = 100;
+      return { totalWeightKg: totalWeight, foamBoxLabel: "กล่องโฟมเล็ก", foamBoxFee, shippingFee, extraFee: foamBoxFee + shippingFee };
+    }
+    const foamBoxFee = 70;
+    const shippingFee = 150;
+    return { totalWeightKg: totalWeight, foamBoxLabel: "กล่องโฟมใหญ่", foamBoxFee, shippingFee, extraFee: foamBoxFee + shippingFee };
+  };
+
   const generateOrderSummary = () => {
     const items = cart
       .map(
@@ -256,8 +283,10 @@ const Order = () => {
       )
       .join("\n");
 
-    const total = getTotal();
-    const summary = `📋 รายการสั่งซื้อ\n${items}\n\n💰 ยอดรวมทั้งสิ้น: ${formatTHB(total)}\n\n👤 ข้อมูลผู้สั่ง\nชื่อ: ${customerInfo.name}\nเบอร์โทร: ${customerInfo.phone}\nที่อยู่: ${customerInfo.address}\nหมายเหตุ: ${customerInfo.note}`;
+    const subTotal = getTotal();
+    const ship = getShippingAndPackaging();
+    const grandTotal = subTotal + ship.extraFee;
+    const summary = `📋 รายการสั่งซื้อ\n${items}\n\n⚖️ น้ำหนักรวม: ${formatKg(ship.totalWeightKg)}\n� ${ship.foamBoxLabel}: ${formatTHB(ship.foamBoxFee)}\n🚚 ค่าส่ง: ${formatTHB(ship.shippingFee)}\n\n� ยอดรวมสินค้า: ${formatTHB(subTotal)}\n✅ ยอดรวมสุทธิ: ${formatTHB(grandTotal)}\n\n👤 ข้อมูลผู้สั่ง\nชื่อ: ${customerInfo.name}\nเบอร์โทร: ${customerInfo.phone}\nที่อยู่: ${customerInfo.address}\nหมายเหตุ: ${customerInfo.note}`;
 
     return summary;
   };
@@ -269,6 +298,15 @@ const Order = () => {
     }
     if (!customerInfo.name || !customerInfo.phone) {
       toast.error("กรุณากรอกชื่อและเบอร์โทร");
+      return;
+    }
+
+    const missingWeight = cart
+      .filter((i) => !i.weightKg || Number(i.weightKg) <= 0)
+      .map((i) => i.name)
+      .filter(Boolean);
+    if (missingWeight.length > 0) {
+      toast.error(`กรุณาใส่น้ำหนักสินค้า (กก.) ในแอดมินก่อน: ${missingWeight.join(", ")}`);
       return;
     }
 
@@ -329,9 +367,27 @@ const Order = () => {
 
     // รวมเงิน
     ctx.font = "bold 16px Arial";
-    const grandTotal = getTotal();
+    const subTotal = getTotal();
+    const ship = getShippingAndPackaging();
+    const grandTotal = subTotal + ship.extraFee;
+
+    ctx.font = "14px Arial";
     ctx.textAlign = "left";
-    ctx.fillText("ยอดรวมทั้งสิ้น", 40, y);
+    ctx.fillText(`น้ำหนักรวม: ${formatKg(ship.totalWeightKg)}`, 40, y);
+    y += 18;
+
+    ctx.fillText(`${ship.foamBoxLabel}: ${formatTHB(ship.foamBoxFee)}`, 40, y);
+    y += 18;
+    ctx.fillText(`ค่าส่ง: ${formatTHB(ship.shippingFee)}`, 40, y);
+    y += 18;
+
+    ctx.font = "bold 14px Arial";
+    ctx.fillText(`ยอดรวมสินค้า: ${formatTHB(subTotal)}`, 40, y);
+    y += 20;
+
+    ctx.font = "bold 18px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText("ยอดรวมสุทธิ", 40, y);
     ctx.textAlign = "right";
     ctx.fillText(formatTHB(grandTotal), canvas.width - 40, y);
     ctx.textAlign = "left";

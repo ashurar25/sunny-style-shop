@@ -28,6 +28,7 @@ const Admin = () => {
     retailPrice: "",
     wholesalePrice: "",
     minWholesaleQty: "",
+    weightKg: "",
     image: "",
     category: "",
   });
@@ -96,6 +97,7 @@ const Admin = () => {
           retailPrice: Number(form.retailPrice),
           wholesalePrice: Number(form.wholesalePrice),
           minWholesaleQty: Number(form.minWholesaleQty),
+          weightKg: form.weightKg ? Number(form.weightKg) : undefined,
           category: form.category || undefined,
         });
         toast.success("แก้ไขสินค้าแล้ว");
@@ -107,6 +109,7 @@ const Admin = () => {
           retailPrice: Number(form.retailPrice),
           wholesalePrice: Number(form.wholesalePrice),
           minWholesaleQty: Number(form.minWholesaleQty),
+          weightKg: form.weightKg ? Number(form.weightKg) : undefined,
           category: form.category || undefined,
         });
         toast.success("เพิ่มสินค้าแล้ว");
@@ -115,7 +118,7 @@ const Admin = () => {
       setProducts(p);
       setCategories(c);
       setEditingId(null);
-      setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", image: "", category: "" });
+      setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", weightKg: "", image: "", category: "" });
       setShowForm(false);
     } catch (e) {
       console.error(e);
@@ -189,6 +192,7 @@ const Admin = () => {
       retailPrice: String(product.retailPrice),
       wholesalePrice: String(product.wholesalePrice),
       minWholesaleQty: String(product.minWholesaleQty),
+      weightKg: product.weightKg !== undefined && product.weightKg !== null ? String(product.weightKg) : "",
       image: product.image || "",
       category: product.category || "",
     });
@@ -385,6 +389,16 @@ const Admin = () => {
                 onChange={e => setForm(f => ({ ...f, minWholesaleQty: e.target.value }))}
               />
             </div>
+            <div className="grid grid-cols-3 gap-3">
+              <Input
+                type="number"
+                inputMode="decimal"
+                step="any"
+                placeholder="น้ำหนัก (กก.) ต่อชิ้น/แพ็ก"
+                value={form.weightKg ?? ""}
+                onChange={e => setForm(f => ({ ...f, weightKg: e.target.value }))}
+              />
+            </div>
             <div className="flex gap-3">
               <Button onClick={handleSave} className="gradient-warm text-primary-foreground flex-1">
                 บันทึก
@@ -394,7 +408,7 @@ const Admin = () => {
                 onClick={() => {
                   setShowForm(false);
                   setEditingId(null);
-                  setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", image: "", category: "" });
+                  setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", weightKg: "", image: "", category: "" });
                 }}
                 className="flex-1"
               >

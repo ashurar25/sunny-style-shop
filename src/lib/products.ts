@@ -5,6 +5,7 @@ export interface Product {
   retailPrice: number;
   wholesalePrice: number;
   minWholesaleQty: number;
+  weightKg?: number;
   description?: string;
   category?: string;
   pinned?: boolean;

@@ -35,6 +35,7 @@ export async function initDatabase() {
         retail_price DECIMAL(10,2) NOT NULL,
         wholesale_price DECIMAL(10,2) NOT NULL,
         min_wholesale_qty INTEGER NOT NULL,
+        weight_kg DECIMAL(10,3),
         description TEXT,
         category VARCHAR(100),
         pinned BOOLEAN DEFAULT FALSE,
@@ -47,6 +48,7 @@ export async function initDatabase() {
     // Migrations for older tables (safe to run repeatedly)
     await execute('ALTER TABLE products ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT FALSE');
     await execute('ALTER TABLE products ADD COLUMN IF NOT EXISTS pinned_at BIGINT');
+    await execute('ALTER TABLE products ADD COLUMN IF NOT EXISTS weight_kg DECIMAL(10,3)');
 
     await execute(`
       CREATE TABLE IF NOT EXISTS categories (
@@ -97,6 +99,7 @@ export async function getProductsFromDB() {
         retail_price::float8 as "retailPrice",
         wholesale_price::float8 as "wholesalePrice",
         min_wholesale_qty::int as "minWholesaleQty",
+        weight_kg::float8 as "weightKg",
         description,
         category,
         COALESCE(pinned, FALSE) as pinned,
@@ -116,8 +119,8 @@ export async function saveProductsToDB(products: any[]) {
     await execute('DELETE FROM products');
     for (const product of products) {
       await execute(
-        'INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category, pinned, pinned_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
-        [product.id, product.name, product.image, product.retailPrice, product.wholesalePrice, product.minWholesaleQty, product.description, product.category, !!product.pinned, product.pinnedAt ?? null]
+        'INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, weight_kg, description, category, pinned, pinned_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',
+        [product.id, product.name, product.image, product.retailPrice, product.wholesalePrice, product.minWholesaleQty, product.weightKg ?? null, product.description, product.category, !!product.pinned, product.pinnedAt ?? null]
       );
     }
   } catch (error) {
@@ -130,8 +133,8 @@ export async function addProductToDB(product: any) {
   try {
     const id = Date.now().toString();
     await execute(
-      'INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, description, category, pinned, pinned_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
-      [id, product.name, product.image, product.retailPrice, product.wholesalePrice, product.minWholesaleQty, product.description, product.category, !!product.pinned, product.pinnedAt ?? null]
+      'INSERT INTO products (id, name, image, retail_price, wholesale_price, min_wholesale_qty, weight_kg, description, category, pinned, pinned_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',
+      [id, product.name, product.image, product.retailPrice, product.wholesalePrice, product.minWholesaleQty, product.weightKg ?? null, product.description, product.category, !!product.pinned, product.pinnedAt ?? null]
     );
     return { ...product, id };
   } catch (error) {
@@ -156,6 +159,7 @@ export async function updateProductInDB(id: string, updates: any) {
     const allowed: Record<string, string> = {
       name: 'name',
       image: 'image',
+      weightKg: 'weight_kg',
       retailPrice: 'retail_price',
       wholesalePrice: 'wholesale_price',
       minWholesaleQty: 'min_wholesale_qty',
