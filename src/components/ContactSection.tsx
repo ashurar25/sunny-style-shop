@@ -54,6 +54,14 @@ const ContactSection = () => {
             <motion.a
               key={c.label}
               href={c.href}
+              onClick={(e) => {
+                // In some embedded previews (iframe/proxy), Facebook refuses to connect.
+                // Force opening in a real new tab/window.
+                if (typeof window !== "undefined") {
+                  e.preventDefault();
+                  window.open(c.href, "_blank", "noopener,noreferrer");
+                }
+              }}
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
