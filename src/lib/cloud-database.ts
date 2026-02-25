@@ -5,7 +5,16 @@ import type { Product } from './products';
 
 function isMissingColumnError(error: any, column: string) {
   const msg = String(error?.message ?? error ?? "");
-  return msg.toLowerCase().includes("column") && msg.toLowerCase().includes(column.toLowerCase()) && msg.toLowerCase().includes("does not exist");
+  const code = String(error?.code ?? "");
+  const m = msg.toLowerCase();
+  const col = column.toLowerCase();
+  // Common PostgREST/Supabase shapes:
+  // - SQL error: column "weight_kg" does not exist
+  // - PostgREST schema cache: PGRST204 Could not find the 'weight_kg' column of 'products' in the schema cache
+  if (code === "PGRST204") {
+    return m.includes(col);
+  }
+  return m.includes("column") && m.includes(col) && m.includes("does not exist");
 }
 
 export async function getProductsFromCloud(): Promise<Product[]> {
