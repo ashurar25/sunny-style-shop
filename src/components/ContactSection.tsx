@@ -22,7 +22,7 @@ const contacts = [
     icon: Facebook,
     label: "Facebook",
     value: "kenginol.ar",
-    href: "https://www.facebook.com/Kenginol.ar",
+    href: "https://m.me/Kenginol.ar",
     gradient: "from-blue-500/15 to-blue-500/5",
     iconColor: "text-blue-600",
   },
