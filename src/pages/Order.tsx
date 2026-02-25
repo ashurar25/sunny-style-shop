@@ -17,6 +17,12 @@ const formatTHB = (amount: number) => {
   return `฿${safe.toLocaleString("th-TH")}`;
 };
 
+const MESSENGER_CHAT_URLS = [
+  // messenger.com is often less restricted than facebook.com in some environments
+  "https://www.messenger.com/t/Kenginol.ar",
+  "https://m.me/Kenginol.ar",
+];
+
 type StoredCartItem = { id: string; quantity: number };
 
 type OrderErrorBoundaryState = { hasError: boolean; message: string };
@@ -378,7 +384,8 @@ const Order = () => {
     // Use window.open in direct click handler to avoid iframe/proxy issues
     // and reduce popup-blocker chances.
     try {
-      window.open(url, "_blank", "noopener,noreferrer");
+      const w = window.open(url, "_blank", "noopener,noreferrer");
+      if (!w) throw new Error("POPUP_BLOCKED");
     } catch {
       const a = document.createElement("a");
       a.href = url;
@@ -387,6 +394,21 @@ const Order = () => {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }
+  };
+
+  const openMessengerChat = () => {
+    // Try multiple URLs; if popups are blocked, user can use the copy-link fallback.
+    try {
+      openExternalBestEffort(MESSENGER_CHAT_URLS[0]);
+      return;
+    } catch {
+      // ignore
+    }
+    try {
+      openExternalBestEffort(MESSENGER_CHAT_URLS[1]);
+    } catch {
+      // ignore
     }
   };
 
@@ -414,10 +436,19 @@ const Order = () => {
     const message = buildReceiptMessage();
     // Note: Facebook does not reliably support pre-filling message text via URL.
     // Best UX: open chat and auto-copy text for paste.
-    const messengerUrl = "https://m.me/Kenginol.ar";
-    openExternalBestEffort(messengerUrl);
-    toast.success("เปิด Messenger แล้ว");
+    openMessengerChat();
+    toast.success("เปิด Messenger แล้ว (ถ้าไม่เปิด ให้กดคัดลอกลิงก์)");
     await copyReceiptMessageBestEffort(message);
+  };
+
+  const handleCopyMessengerLink = async () => {
+    const url = MESSENGER_CHAT_URLS[0];
+    try {
+      await navigator.clipboard?.writeText(url);
+      toast.success("คัดลอกลิงก์ Messenger แล้ว");
+    } catch {
+      toast.error("คัดลอกลิงก์ไม่สำเร็จ");
+    }
   };
 
   const handleSendReceiptToLine = async () => {
@@ -565,6 +596,9 @@ const Order = () => {
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button variant="outline" onClick={handleCopyReceiptMessage} className="flex-1">
                   คัดลอกข้อความสรุป
+                </Button>
+                <Button variant="outline" onClick={handleCopyMessengerLink} className="flex-1">
+                  คัดลอกลิงก์ Messenger
                 </Button>
                 <Button variant="outline" onClick={handleDownloadReceipt} className="flex-1">
                   บันทึกใบเสร็จ
