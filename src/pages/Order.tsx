@@ -12,6 +12,11 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+const formatTHB = (amount: number) => {
+  const safe = Number.isFinite(amount) ? amount : 0;
+  return `฿${safe.toLocaleString("th-TH")}`;
+};
+
 type StoredCartItem = { id: string; quantity: number };
 
 type OrderErrorBoundaryState = { hasError: boolean; message: string };
@@ -239,7 +244,7 @@ const Order = () => {
       .join("\n");
 
     const total = getTotal();
-    const summary = `📋 รายการสั่งซื้อ\n${items}\n\n💰 รวมทั้งหมด: ฿${total}\n\n👤 ข้อมูลผู้สั่ง\nชื่อ: ${customerInfo.name}\nเบอร์โทร: ${customerInfo.phone}\nที่อยู่: ${customerInfo.address}\nหมายเหตุ: ${customerInfo.note}`;
+    const summary = `📋 รายการสั่งซื้อ\n${items}\n\n💰 ยอดรวมทั้งสิ้น: ${formatTHB(total)}\n\n👤 ข้อมูลผู้สั่ง\nชื่อ: ${customerInfo.name}\nเบอร์โทร: ${customerInfo.phone}\nที่อยู่: ${customerInfo.address}\nหมายเหตุ: ${customerInfo.note}`;
 
     return summary;
   };
@@ -311,7 +316,12 @@ const Order = () => {
 
     // รวมเงิน
     ctx.font = "bold 16px Arial";
-    ctx.fillText(`รวมทั้พิม ์฿${getTotal()}`, 40, y);
+    const grandTotal = getTotal();
+    ctx.textAlign = "left";
+    ctx.fillText("ยอดรวมทั้งสิ้น", 40, y);
+    ctx.textAlign = "right";
+    ctx.fillText(formatTHB(grandTotal), canvas.width - 40, y);
+    ctx.textAlign = "left";
 
     // โลโก้ด้านล่าง
     try {
