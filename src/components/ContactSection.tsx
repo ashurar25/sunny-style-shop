@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Phone, MessageCircle, Facebook } from "lucide-react";
+import { Phone, MessageCircle, Facebook, BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const contacts = [
   {
@@ -82,6 +83,17 @@ const ContactSection = () => {
               </div>
             </motion.a>
           ))}
+        </div>
+
+        <div className="mt-5 flex justify-center">
+          <Link
+            to="/how-to-order"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-3 glass border border-border text-sm font-semibold text-foreground hover:shadow-warm transition-shadow"
+            title="ดูวิธีสั่งสินค้า"
+          >
+            <BookOpen className="w-4 h-4" />
+            วิธีสั่งสินค้า
+          </Link>
         </div>
       </div>
     </section>
