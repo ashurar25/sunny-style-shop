@@ -51,6 +51,13 @@ const Index = () => {
       {/* Divider wave */}
       <div className="h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       
+      {/* Quick order hint banner */}
+      <div className="text-center py-3 px-4 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-b border-emerald-500/20">
+        <p className="text-sm text-emerald-700 dark:text-emerald-300 font-medium">
+          วิธีสั่งง่ายที่สุด คือแค่ปรูปสินค้าแล้วสั่งกับแอดมินทาง Line หรือเพจได้เลย
+        </p>
+      </div>
+      
       <ProductGrid />
       <ContactSection />
 

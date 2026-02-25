@@ -149,6 +149,13 @@ const HowToOrder = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        {/* Top banner */}
+        <div className="text-center py-3 px-4 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-b border-emerald-500/20 rounded-xl">
+          <p className="text-sm text-emerald-700 dark:text-emerald-300 font-medium">
+            วิธีสั่งง่ายที่สุด คือแค่ปรูปสินค้าแล้วสั่งกับแอดมินทาง Line หรือเพจได้เลย
+          </p>
+        </div>
+
         <section className="glass rounded-2xl p-6 border border-border">
           <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
             <div>
