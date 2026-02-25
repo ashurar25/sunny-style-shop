@@ -9,6 +9,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
+const getErrorMessage = (e: unknown) => {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "string") return e;
+  try {
+    return JSON.stringify(e);
+  } catch {
+    return "Unknown error";
+  }
+};
+
 const ADMIN_AUTH_KEY = "krungkring_admin_authed";
 const ADMIN_ID = "kenginol";
 const ADMIN_PASS = "930425";
@@ -122,7 +132,7 @@ const Admin = () => {
       setShowForm(false);
     } catch (e) {
       console.error(e);
-      toast.error("บันทึกไม่สำเร็จ");
+      toast.error(`บันทึกไม่สำเร็จ: ${getErrorMessage(e)}`);
     }
   };
 
