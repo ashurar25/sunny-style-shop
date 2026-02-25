@@ -383,19 +383,12 @@ const Order = () => {
   };
 
   const openExternalBestEffort = (url: string) => {
-    // Use window.open in direct click handler to avoid iframe/proxy issues
-    // and reduce popup-blocker chances.
+    // Facebook blocks rendering inside iframes (ERR_BLOCKED_BY_RESPONSE).
+    // Navigate the top-level window to escape the iframe.
     try {
-      const w = window.open(url, "_blank", "noopener,noreferrer");
-      if (!w) throw new Error("POPUP_BLOCKED");
+      (window.top || window).location.href = url;
     } catch {
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      window.location.href = url;
     }
   };
 

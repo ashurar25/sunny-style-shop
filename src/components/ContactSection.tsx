@@ -55,14 +55,16 @@ const ContactSection = () => {
               key={c.label}
               href={c.href}
               onClick={(e) => {
-                // In some embedded previews (iframe/proxy), Facebook refuses to connect.
-                // Force opening in a real new tab/window.
-                if (typeof window !== "undefined") {
-                  e.preventDefault();
-                  window.open(c.href, "_blank", "noopener,noreferrer");
+                // Facebook blocks loading inside iframes (ERR_BLOCKED_BY_RESPONSE).
+                // Use top-level navigation to escape the iframe.
+                e.preventDefault();
+                try {
+                  (window.top || window).location.href = c.href;
+                } catch {
+                  window.location.href = c.href;
                 }
               }}
-              target="_blank"
+              target="_top"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
