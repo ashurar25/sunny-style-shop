@@ -274,12 +274,15 @@ const Order = () => {
   const generateOrderSummary = () => {
     const items = cart
       .map(
-        (item) =>
-          `${item.name} x${item.quantity} = ฿${
-            item.quantity >= item.minWholesaleQty
-              ? item.wholesalePrice
-              : item.retailPrice
-          }/ชิ้น`
+        (item) => {
+          const price = item.quantity >= item.minWholesaleQty
+            ? item.wholesalePrice
+            : item.retailPrice;
+          const weightNote = item.weightKg && Number(item.weightKg) > 0
+            ? ` (น้ำหนัก ${item.weightKg} กก./แพ็ค)`
+            : '';
+          return `${item.name} x${item.quantity} = ฿${price}/ชิ้น${weightNote}`;
+        }
       )
       .join("\n");
 
