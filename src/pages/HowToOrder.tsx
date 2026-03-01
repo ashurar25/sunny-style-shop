@@ -71,7 +71,7 @@ const StepIllustration = ({ title, steps }: { title: string; steps: string[] }) 
                 </text>
                 <foreignObject x={x + 18} y={y + 44} width={boxW - 36} height={72}>
                   <div
-                    xmlns="http://www.w3.org/1999/xhtml"
+                    {...{ xmlns: "http://www.w3.org/1999/xhtml" } as any}
                     style={{
                       fontSize: 14,
                       lineHeight: 1.35,

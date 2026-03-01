@@ -63,10 +63,10 @@ export async function addProductToCloud(product: Omit<Product, 'id'>): Promise<P
     pinned: !!product.pinned,
     pinned_at: product.pinnedAt ?? null,
   };
-  let { error } = await supabase.from('products').insert(payload);
+  let { error } = await supabase.from('products').insert(payload as any);
   if (error && isMissingColumnError(error, 'weight_kg')) {
     delete payload.weight_kg;
-    ({ error } = await supabase.from('products').insert(payload));
+    ({ error } = await supabase.from('products').insert(payload as any));
   }
   if (error) throw error;
   return { ...product, id };
