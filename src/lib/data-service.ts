@@ -15,7 +15,7 @@ const cache: {
 };
 
 const CACHE_TTL = 60_000;
-const DB_FETCH_TIMEOUT_MS = 10_000;
+const DB_FETCH_TIMEOUT_MS = 5_000;
 
 async function retryOnce<T>(fn: () => Promise<T>) {
   try {
