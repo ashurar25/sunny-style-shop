@@ -19,9 +19,9 @@ const ProductGrid = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [productsData, categoriesData] = await Promise.all([
-          DataService.getProductsFromDBOnly(),
-          DataService.getCategoriesFromDBOnly()
+      const [productsData, categoriesData] = await Promise.all([
+          DataService.getProducts(),
+          DataService.getCategories()
         ]);
         setProducts(productsData);
         setCategories(categoriesData);
