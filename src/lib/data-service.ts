@@ -15,7 +15,7 @@ const cache: {
 };
 
 const CACHE_TTL = 60_000;
-const DB_FETCH_TIMEOUT_MS = 5_000;
+const DB_FETCH_TIMEOUT_MS = 120_000; // 2 minutes — no timeout for slow connections
 
 async function retryOnce<T>(fn: () => Promise<T>) {
   try {
