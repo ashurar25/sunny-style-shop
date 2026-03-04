@@ -182,6 +182,26 @@ const Order = () => {
     }
   }, [customerInfo]);
 
+  // Auto-generate weight notes in remarks when cart changes
+  useEffect(() => {
+    const weightLines = cart
+      .filter((item) => item.weightKg && Number(item.weightKg) > 0)
+      .map((item) => `- ${item.name} ขนาดแพ็คละ ${item.weightKg} กก.`);
+
+    if (weightLines.length === 0) return;
+
+    const autoNote = `📦 น้ำหนักสินค้า:\n${weightLines.join("\n")}`;
+
+    setCustomerInfo((prev) => {
+      // Remove old auto-generated weight note (starts with 📦)
+      const manualNote = prev.note
+        .replace(/📦 น้ำหนักสินค้า:[\s\S]*?(?=\n[^-]|$)/g, "")
+        .trim();
+      const newNote = manualNote ? `${manualNote}\n\n${autoNote}` : autoNote;
+      return { ...prev, note: newNote };
+    });
+  }, [cart]);
+
   useEffect(() => {
     const loadProducts = async () => {
       try {
