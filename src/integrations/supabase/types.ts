@@ -45,6 +45,7 @@ export type Database = {
           pinned_at: number | null
           retail_price: number
           updated_at: string
+          weight_kg: number | null
           wholesale_price: number
         }
         Insert: {
@@ -59,6 +60,7 @@ export type Database = {
           pinned_at?: number | null
           retail_price: number
           updated_at?: string
+          weight_kg?: number | null
           wholesale_price: number
         }
         Update: {
@@ -73,6 +75,7 @@ export type Database = {
           pinned_at?: number | null
           retail_price?: number
           updated_at?: string
+          weight_kg?: number | null
           wholesale_price?: number
         }
         Relationships: []
