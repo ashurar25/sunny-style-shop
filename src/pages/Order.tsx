@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { DataService, type Product } from "@/lib/data-service";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CartItem extends Product {
   quantity: number;
@@ -73,6 +75,7 @@ class OrderErrorBoundary extends React.Component<React.PropsWithChildren, OrderE
 }
 
 const Order = () => {
+  const { user, profile } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [customerInfo, setCustomerInfo] = useState({
@@ -81,6 +84,7 @@ const Order = () => {
     address: "",
     note: "",
   });
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -109,6 +113,17 @@ const Order = () => {
     }
   }, []);
 
+  // Auto-fill from profile when logged in
+  useEffect(() => {
+    if (profileLoaded || !profile) return;
+    setCustomerInfo((prev) => ({
+      ...prev,
+      name: profile.full_name || prev.name,
+      phone: profile.phone || prev.phone,
+      address: profile.address || prev.address,
+    }));
+    setProfileLoaded(true);
+  }, [profile, profileLoaded]);
   useEffect(() => {
     const savedV2 = localStorage.getItem(CART_STORAGE_KEY_V2);
     if (savedV2) {
@@ -552,9 +567,53 @@ const Order = () => {
     await copyReceiptMessageBestEffort(message);
   };
 
+  const handleSaveOrder = async () => {
+    if (!user) {
+      toast.error("กรุณาเข้าสู่ระบบก่อนบันทึกออเดอร์");
+      return;
+    }
+    if (cart.length === 0) {
+      toast.error("ยังไม่มีสินค้าในตะกร้า");
+      return;
+    }
+    const subTotal = getTotal();
+    const ship = getShippingAndPackaging();
+    const { error } = await supabase.from("orders").insert({
+      user_id: user.id,
+      items: cart.map((i) => ({
+        name: i.name,
+        quantity: i.quantity,
+        price: i.quantity >= i.minWholesaleQty ? i.wholesalePrice : i.retailPrice,
+      })) as any,
+      subtotal: subTotal,
+      shipping_fee: ship.shippingFee,
+      foam_box_fee: ship.foamBoxFee,
+      grand_total: subTotal + ship.extraFee,
+      customer_name: customerInfo.name,
+      customer_phone: customerInfo.phone,
+      customer_address: customerInfo.address,
+      customer_note: customerInfo.note,
+    });
+    if (error) {
+      toast.error("บันทึกออเดอร์ไม่สำเร็จ");
+      console.error(error);
+    } else {
+      toast.success("บันทึกออเดอร์เรียบร้อย ดูได้ในโปรไฟล์");
+    }
+  };
+
   return (
     <OrderErrorBoundary>
     <div className="min-h-screen bg-background">
+      {/* Login prompt */}
+      {!user && (
+        <div className="bg-primary/10 border-b border-primary/20 text-center py-2 px-4">
+          <p className="text-sm text-foreground">
+            <Link to="/auth" className="text-primary font-semibold hover:underline">เข้าสู่ระบบ</Link>
+            {" "}เพื่อกรอกที่อยู่อัตโนมัติและเก็บประวัติสั่งซื้อ
+          </p>
+        </div>
+      )}
       {/* Header */}
       <header className="glass sticky top-0 z-40 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -670,6 +729,11 @@ const Order = () => {
             <Button variant="outline" onClick={handleDownloadReceipt} className="flex-1">
               บันทึกใบเสร็จ
             </Button>
+            {user && (
+              <Button variant="outline" onClick={handleSaveOrder} className="flex-1 text-primary border-primary/30">
+                💾 บันทึกออเดอร์
+              </Button>
+            )}
           </div>
 
           {receiptImage && (
