@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { DataService, type Product } from "@/lib/data-service";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CartItem extends Product {
   quantity: number;
@@ -73,6 +75,7 @@ class OrderErrorBoundary extends React.Component<React.PropsWithChildren, OrderE
 }
 
 const Order = () => {
+  const { user, profile } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [customerInfo, setCustomerInfo] = useState({
@@ -81,6 +84,7 @@ const Order = () => {
     address: "",
     note: "",
   });
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
