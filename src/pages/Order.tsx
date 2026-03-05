@@ -729,6 +729,11 @@ const Order = () => {
             <Button variant="outline" onClick={handleDownloadReceipt} className="flex-1">
               บันทึกใบเสร็จ
             </Button>
+            {user && (
+              <Button variant="outline" onClick={handleSaveOrder} className="flex-1 text-primary border-primary/30">
+                💾 บันทึกออเดอร์
+              </Button>
+            )}
           </div>
 
           {receiptImage && (
