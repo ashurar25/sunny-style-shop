@@ -567,6 +567,41 @@ const Order = () => {
     await copyReceiptMessageBestEffort(message);
   };
 
+  const handleSaveOrder = async () => {
+    if (!user) {
+      toast.error("กรุณาเข้าสู่ระบบก่อนบันทึกออเดอร์");
+      return;
+    }
+    if (cart.length === 0) {
+      toast.error("ยังไม่มีสินค้าในตะกร้า");
+      return;
+    }
+    const subTotal = getTotal();
+    const ship = getShippingAndPackaging();
+    const { error } = await supabase.from("orders").insert({
+      user_id: user.id,
+      items: cart.map((i) => ({
+        name: i.name,
+        quantity: i.quantity,
+        price: i.quantity >= i.minWholesaleQty ? i.wholesalePrice : i.retailPrice,
+      })) as any,
+      subtotal: subTotal,
+      shipping_fee: ship.shippingFee,
+      foam_box_fee: ship.foamBoxFee,
+      grand_total: subTotal + ship.extraFee,
+      customer_name: customerInfo.name,
+      customer_phone: customerInfo.phone,
+      customer_address: customerInfo.address,
+      customer_note: customerInfo.note,
+    });
+    if (error) {
+      toast.error("บันทึกออเดอร์ไม่สำเร็จ");
+      console.error(error);
+    } else {
+      toast.success("บันทึกออเดอร์เรียบร้อย ดูได้ในโปรไฟล์");
+    }
+  };
+
   return (
     <OrderErrorBoundary>
     <div className="min-h-screen bg-background">
