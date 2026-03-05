@@ -5,6 +5,8 @@ import { Flame, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
   product: Product;
@@ -14,7 +16,13 @@ interface ProductCardProps {
 }
 
 const ProductCard = React.memo(function ProductCard({ product, index, enableAddToCart = false, highPriorityImage = false }: ProductCardProps) {
+  const { user } = useAuth();
+
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้า");
+      return;
+    }
     try {
       const key = "sunny_cart_v2";
       const raw = localStorage.getItem(key);
@@ -95,9 +103,17 @@ const ProductCard = React.memo(function ProductCard({ product, index, enableAddT
         </div>
 
         {enableAddToCart && (
-          <Button onClick={handleAddToCart} className="w-full gradient-warm text-primary-foreground h-9 text-sm">
-            เพิ่มลงตะกร้า
-          </Button>
+          user ? (
+            <Button onClick={handleAddToCart} className="w-full gradient-warm text-primary-foreground h-9 text-sm">
+              เพิ่มลงตะกร้า
+            </Button>
+          ) : (
+            <Link to="/auth">
+              <Button className="w-full gradient-warm text-primary-foreground h-9 text-sm">
+                เข้าสู่ระบบเพื่อสั่งซื้อ
+              </Button>
+            </Link>
+          )
         )}
       </div>
     </motion.div>

@@ -88,6 +88,21 @@ const Order = () => {
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Guard: require login to place order
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="glass w-full max-w-md rounded-[var(--radius)] p-6 space-y-4 text-center">
+          <div className="text-lg font-semibold text-foreground">ต้องเข้าสู่ระบบก่อนสั่งซื้อ</div>
+          <div className="text-sm text-muted-foreground">กรุณาเข้าสู่ระบบเพื่อดำเนินการสั่งซื้อสินค้า</div>
+          <Link to="/auth">
+            <Button className="gradient-warm text-primary-foreground w-full">เข้าสู่ระบบ</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const receiptLogoUrl = "/logo.png";
   const cartFallbackImageUrl = "/placeholder.svg";
 

@@ -81,9 +81,9 @@ const Index = () => {
           {user ? <UserCircle className="w-6 h-6" /> : <LogIn className="w-6 h-6" />}
         </Link>
         <Link
-          to="/order"
+          to={user ? "/order" : "/auth"}
           className="relative w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg text-white"
-          title="สั่งซื้อ"
+          title={user ? "สั่งซื้อ" : "เข้าสู่ระบบเพื่อสั่งซื้อ"}
         >
           <ShoppingCart className="w-6 h-6" />
           {cartCount > 0 && (
