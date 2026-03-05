@@ -113,6 +113,17 @@ const Order = () => {
     }
   }, []);
 
+  // Auto-fill from profile when logged in
+  useEffect(() => {
+    if (profileLoaded || !profile) return;
+    setCustomerInfo((prev) => ({
+      ...prev,
+      name: profile.full_name || prev.name,
+      phone: profile.phone || prev.phone,
+      address: profile.address || prev.address,
+    }));
+    setProfileLoaded(true);
+  }, [profile, profileLoaded]);
   useEffect(() => {
     const savedV2 = localStorage.getItem(CART_STORAGE_KEY_V2);
     if (savedV2) {
