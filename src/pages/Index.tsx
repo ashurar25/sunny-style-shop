@@ -3,7 +3,8 @@ import ProductGrid from "@/components/ProductGrid";
 import ContactSection from "@/components/ContactSection";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Settings, ShoppingCart } from "lucide-react";
+import { Settings, ShoppingCart, UserCircle, LogIn } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const ADMIN_AUTH_KEY = "krungkring_admin_authed";
 const CART_STORAGE_KEY_V2 = "sunny_cart_v2";
@@ -11,6 +12,7 @@ const CART_STORAGE_KEY_V2 = "sunny_cart_v2";
 const Index = () => {
   const authed = localStorage.getItem(ADMIN_AUTH_KEY) === "1";
   const [cartCount, setCartCount] = useState(0);
+  const { user } = useAuth();
 
   useEffect(() => {
     const readCount = () => {

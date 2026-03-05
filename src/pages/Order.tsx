@@ -570,6 +570,15 @@ const Order = () => {
   return (
     <OrderErrorBoundary>
     <div className="min-h-screen bg-background">
+      {/* Login prompt */}
+      {!user && (
+        <div className="bg-primary/10 border-b border-primary/20 text-center py-2 px-4">
+          <p className="text-sm text-foreground">
+            <Link to="/auth" className="text-primary font-semibold hover:underline">เข้าสู่ระบบ</Link>
+            {" "}เพื่อกรอกที่อยู่อัตโนมัติและเก็บประวัติสั่งซื้อ
+          </p>
+        </div>
+      )}
       {/* Header */}
       <header className="glass sticky top-0 z-40 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
