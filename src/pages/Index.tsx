@@ -72,6 +72,14 @@ const Index = () => {
 
       {/* FABs */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        {/* User/Login button */}
+        <Link
+          to={user ? "/profile" : "/auth"}
+          className="w-14 h-14 bg-card border border-border rounded-2xl flex items-center justify-center shadow-lg text-foreground hover:bg-muted transition-colors"
+          title={user ? "โปรไฟล์" : "เข้าสู่ระบบ"}
+        >
+          {user ? <UserCircle className="w-6 h-6" /> : <LogIn className="w-6 h-6" />}
+        </Link>
         <Link
           to="/order"
           className="relative w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg text-white"
