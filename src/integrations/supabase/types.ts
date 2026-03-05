@@ -32,6 +32,54 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          created_at: string
+          customer_address: string
+          customer_name: string
+          customer_note: string
+          customer_phone: string
+          foam_box_fee: number
+          grand_total: number
+          id: string
+          items: Json
+          shipping_fee: number
+          status: string
+          subtotal: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_address?: string
+          customer_name?: string
+          customer_note?: string
+          customer_phone?: string
+          foam_box_fee?: number
+          grand_total?: number
+          id?: string
+          items?: Json
+          shipping_fee?: number
+          status?: string
+          subtotal?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string
+          customer_name?: string
+          customer_note?: string
+          customer_phone?: string
+          foam_box_fee?: number
+          grand_total?: number
+          id?: string
+          items?: Json
+          shipping_fee?: number
+          status?: string
+          subtotal?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string | null
@@ -77,6 +125,33 @@ export type Database = {
           updated_at?: string
           weight_kg?: number | null
           wholesale_price?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string
+          created_at: string
+          full_name: string
+          id: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          full_name?: string
+          id: string
+          phone?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string
+          updated_at?: string
         }
         Relationships: []
       }
