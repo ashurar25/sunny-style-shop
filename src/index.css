@@ -176,12 +176,12 @@ html {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(35 30% 95%);
+  background: hsl(var(--background));
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(28 60% 75%);
+  background: hsl(var(--muted-foreground) / 0.4);
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(28 80% 60%);
+  background: hsl(var(--muted-foreground) / 0.6);
 }
