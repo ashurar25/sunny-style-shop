@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, type ChangeEvent } from "react";
+import { useState, useEffect, useRef, lazy, Suspense, type ChangeEvent } from "react";
 import { DataService, type Product } from "@/lib/data-service";
 import { compressImageToBlob, uploadProductImageBlob } from "@/lib/storage";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ImagePlus, Tag, X, Pin, PinOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ImagePlus, Tag, X, Pin, PinOff, Loader2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
