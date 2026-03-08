@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface ProductCardProps {
   product: Product;
@@ -51,12 +52,11 @@ const ProductCard = React.memo(function ProductCard({ product, index, enableAddT
     >
       <div className="aspect-[4/3] bg-gradient-to-br from-muted to-muted/60 flex items-center justify-center overflow-hidden relative">
         {product.image ? (
-          <img
+          <OptimizedImage
             src={product.image}
             alt={product.name}
-            loading={highPriorityImage ? "eager" : "lazy"}
-            decoding="async"
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            priority={highPriorityImage}
+            className="w-full h-full"
           />
         ) : (
           <div className="flex flex-col items-center gap-2">

@@ -50,6 +50,12 @@ export async function initDatabase() {
     await execute('ALTER TABLE products ADD COLUMN IF NOT EXISTS pinned_at BIGINT');
     await execute('ALTER TABLE products ADD COLUMN IF NOT EXISTS weight_kg DECIMAL(10,3)');
 
+    // Add indexes for performance
+    await execute('CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)');
+    await execute('CREATE INDEX IF NOT EXISTS idx_products_pinned ON products(pinned) WHERE pinned = TRUE');
+    await execute('CREATE INDEX IF NOT EXISTS idx_products_pinned_at ON products(pinned_at DESC)');
+    await execute('CREATE INDEX IF NOT EXISTS idx_products_created_at ON products(created_at DESC)');
+
     await execute(`
       CREATE TABLE IF NOT EXISTS categories (
         id SERIAL PRIMARY KEY,

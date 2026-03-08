@@ -10,6 +10,27 @@
     <meta name="description" content="ปอเปี๊ยะทอดกรอบ ไก่ทอดกรอบ กุ้งทอดกรอบ สดใหม่ทุกวัน สั่งซื้อง่ายผ่าน Line และ Facebook" />
     <meta name="author" content="กรุ๊งกริ๊ง ทอดกรอบ" />
 
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="//supabase.co" />
+    <link rel="dns-prefetch" href="//neon.tech" />
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+
     <!-- Open Graph tags -->
     <meta property="og:title" content="กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป" />
     <meta property="og:description" content="กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป สดใหม่ทุกวัน สั่งซื้อง่ายผ่าน Line และ Facebook" />
