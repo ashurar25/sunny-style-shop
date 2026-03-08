@@ -65,11 +65,31 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast.error("เข้าสู่ระบบด้วย Google ไม่สำเร็จ");
+      const isLovableDomain =
+        window.location.hostname.includes("lovable.app") ||
+        window.location.hostname.includes("lovableproject.com") ||
+        window.location.hostname === "localhost";
+
+      if (isLovableDomain) {
+        const result = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: window.location.origin,
+        });
+        if (result.error) {
+          toast.error("เข้าสู่ระบบด้วย Google ไม่สำเร็จ");
+        }
+      } else {
+        // Custom domain (e.g. Vercel): use Supabase OAuth directly
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: window.location.origin,
+            skipBrowserRedirect: true,
+          },
+        });
+        if (error) throw error;
+        if (data?.url) {
+          window.location.href = data.url;
+        }
       }
     } catch {
       toast.error("เกิดข้อผิดพลาด");
