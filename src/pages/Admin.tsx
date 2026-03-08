@@ -207,6 +207,12 @@ const Admin = () => {
         {/* Tabs */}
         <div className="max-w-4xl mx-auto px-4 flex gap-1 pb-2">
           <button
+            onClick={() => setActiveTab("dashboard")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === "dashboard" ? "gradient-warm text-primary-foreground shadow-warm" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            แดชบอร์ด
+          </button>
+          <button
             onClick={() => setActiveTab("products")}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === "products" ? "gradient-warm text-primary-foreground shadow-warm" : "text-muted-foreground hover:bg-muted"}`}
           >
