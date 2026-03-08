@@ -21,7 +21,7 @@ const getErrorMessage = (e: unknown) => {
 
 const Admin = () => {
   const { isAdmin, loading: adminLoading, user } = useAdmin();
-  const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "products" | "orders">("dashboard");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
