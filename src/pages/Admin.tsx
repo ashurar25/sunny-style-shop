@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAdmin } from "@/hooks/useAdmin";
 
 const AdminOrders = lazy(() => import("@/components/AdminOrders"));
+const AdminDashboard = lazy(() => import("@/components/AdminDashboard"));
 
 const getErrorMessage = (e: unknown) => {
   if (e instanceof Error) return e.message;
