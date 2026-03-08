@@ -221,105 +221,113 @@ const Admin = () => {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Category Management */}
-        {showCategoryForm && (
-          <div className="glass rounded-[var(--radius)] p-6 space-y-4 animate-fade-up">
-            <h2 className="font-semibold text-lg text-foreground flex items-center gap-2">
-              <Tag className="w-5 h-5 text-primary" /> จัดการหมวดหมู่
-            </h2>
-            <div className="flex gap-2">
-              <Input placeholder="ชื่อหมวดหมู่ใหม่" value={newCategory} onChange={e => setNewCategory(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAddCategory()} />
-              <Button onClick={handleAddCategory} className="gradient-warm text-primary-foreground shrink-0"><Plus className="w-4 h-4" /></Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map(cat => (
-                <Badge key={cat} variant="secondary" className="text-sm py-1.5 px-3 flex items-center gap-1.5">
-                  {cat}
-                  <button onClick={() => handleDeleteCategory(cat)} className="ml-1 hover:text-destructive transition-colors"><X className="w-3 h-3" /></button>
-                </Badge>
+        {activeTab === "orders" ? (
+          <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>}>
+            <AdminOrders />
+          </Suspense>
+        ) : (
+          <>
+            {/* Category Management */}
+            {showCategoryForm && (
+              <div className="glass rounded-[var(--radius)] p-6 space-y-4 animate-fade-up">
+                <h2 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                  <Tag className="w-5 h-5 text-primary" /> จัดการหมวดหมู่
+                </h2>
+                <div className="flex gap-2">
+                  <Input placeholder="ชื่อหมวดหมู่ใหม่" value={newCategory} onChange={e => setNewCategory(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAddCategory()} />
+                  <Button onClick={handleAddCategory} className="gradient-warm text-primary-foreground shrink-0"><Plus className="w-4 h-4" /></Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map(cat => (
+                    <Badge key={cat} variant="secondary" className="text-sm py-1.5 px-3 flex items-center gap-1.5">
+                      {cat}
+                      <button onClick={() => handleDeleteCategory(cat)} className="ml-1 hover:text-destructive transition-colors"><X className="w-3 h-3" /></button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Add/Edit Form */}
+            {showForm && (
+              <div className="glass rounded-[var(--radius)] p-6 space-y-4 animate-fade-up">
+                <h2 className="font-semibold text-lg text-foreground">{editingId ? "แก้ไขสินค้า" : "เพิ่มสินค้าใหม่"}</h2>
+                <div onClick={() => fileRef.current?.click()} className="w-full h-48 rounded-xl bg-muted flex flex-col items-center justify-center cursor-pointer hover:bg-muted/70 transition-colors overflow-hidden">
+                  {form.image ? (
+                    <img src={form.image} alt="preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <ImagePlus className="w-10 h-10 text-muted-foreground/50 mb-2" />
+                      <span className="text-sm text-muted-foreground">คลิกเพื่ออัพโหลดรูปภาพ</span>
+                    </>
+                  )}
+                </div>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <Input placeholder="ชื่อสินค้า" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                <Textarea placeholder="รายละเอียด (ไม่จำเป็น)" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">หมวดหมู่</label>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map(cat => (
+                      <button key={cat} type="button" onClick={() => setForm(f => ({ ...f, category: f.category === cat ? "" : cat }))}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${form.category === cat ? "gradient-warm text-primary-foreground shadow-warm" : "bg-muted text-muted-foreground hover:bg-muted/70"}`}>
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <Input type="number" inputMode="decimal" step="any" placeholder="ราคาปลีก" value={form.retailPrice ?? ""} onChange={e => setForm(f => ({ ...f, retailPrice: e.target.value }))} />
+                  <Input type="number" inputMode="decimal" step="any" placeholder="ราคาส่ง" value={form.wholesalePrice ?? ""} onChange={e => setForm(f => ({ ...f, wholesalePrice: e.target.value }))} />
+                  <Input type="number" inputMode="numeric" step="1" placeholder="ขั้นต่ำ (ชิ้น)" value={form.minWholesaleQty ?? ""} onChange={e => setForm(f => ({ ...f, minWholesaleQty: e.target.value }))} />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <Input type="number" inputMode="decimal" step="any" placeholder="น้ำหนัก (กก.)" value={form.weightKg ?? ""} onChange={e => setForm(f => ({ ...f, weightKg: e.target.value }))} />
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={handleSave} className="gradient-warm text-primary-foreground flex-1">บันทึก</Button>
+                  <Button variant="outline" onClick={() => { setShowForm(false); setEditingId(null); setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", weightKg: "", image: "", category: "" }); }} className="flex-1">ยกเลิก</Button>
+                </div>
+              </div>
+            )}
+
+            {/* Product list */}
+            <div className="space-y-3">
+              {products.slice().sort((a, b) => {
+                const ap = a.pinned ? 1 : 0; const bp = b.pinned ? 1 : 0;
+                if (ap !== bp) return bp - ap;
+                const at = a.pinnedAt ?? 0; const bt = b.pinnedAt ?? 0;
+                if (at !== bt) return bt - at;
+                return Number(b.id) - Number(a.id);
+              }).map(product => (
+                <div key={product.id} className="glass rounded-[var(--radius)] p-4 flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
+                    {product.image ? (
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">ไม่มีรูป</div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
+                      {product.pinned && <Badge className="text-xs shrink-0 gradient-warm text-primary-foreground border-0" variant="secondary">ขายดี</Badge>}
+                      {product.category && <Badge variant="secondary" className="text-xs shrink-0">{product.category}</Badge>}
+                    </div>
+                    <p className="text-sm text-muted-foreground">ปลีก ฿{product.retailPrice} | ส่ง ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})</p>
+                  </div>
+                  <Button variant="outline" onClick={() => handleTogglePin(product)} className="rounded-xl shrink-0" title={product.pinned ? "ถอนหมุด" : "ปักหมุด"}>
+                    {product.pinned ? (<><PinOff className="w-4 h-4 mr-1" /> ถอนหมุด</>) : (<><Pin className="w-4 h-4 mr-1" /> ปักหมุด</>)}
+                  </Button>
+                  <Button variant="outline" onClick={() => startEdit(product)} className="rounded-xl shrink-0">แก้ไข</Button>
+                  <button onClick={() => handleDelete(product.id)} className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors shrink-0">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               ))}
             </div>
-          </div>
+          </>
         )}
-
-        {/* Add/Edit Form */}
-        {showForm && (
-          <div className="glass rounded-[var(--radius)] p-6 space-y-4 animate-fade-up">
-            <h2 className="font-semibold text-lg text-foreground">{editingId ? "แก้ไขสินค้า" : "เพิ่มสินค้าใหม่"}</h2>
-            <div onClick={() => fileRef.current?.click()} className="w-full h-48 rounded-xl bg-muted flex flex-col items-center justify-center cursor-pointer hover:bg-muted/70 transition-colors overflow-hidden">
-              {form.image ? (
-                <img src={form.image} alt="preview" className="w-full h-full object-cover" />
-              ) : (
-                <>
-                  <ImagePlus className="w-10 h-10 text-muted-foreground/50 mb-2" />
-                  <span className="text-sm text-muted-foreground">คลิกเพื่ออัพโหลดรูปภาพ</span>
-                </>
-              )}
-            </div>
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-            <Input placeholder="ชื่อสินค้า" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-            <Textarea placeholder="รายละเอียด (ไม่จำเป็น)" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} />
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">หมวดหมู่</label>
-              <div className="flex flex-wrap gap-2">
-                {categories.map(cat => (
-                  <button key={cat} type="button" onClick={() => setForm(f => ({ ...f, category: f.category === cat ? "" : cat }))}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${form.category === cat ? "gradient-warm text-primary-foreground shadow-warm" : "bg-muted text-muted-foreground hover:bg-muted/70"}`}>
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <Input type="number" inputMode="decimal" step="any" placeholder="ราคาปลีก" value={form.retailPrice ?? ""} onChange={e => setForm(f => ({ ...f, retailPrice: e.target.value }))} />
-              <Input type="number" inputMode="decimal" step="any" placeholder="ราคาส่ง" value={form.wholesalePrice ?? ""} onChange={e => setForm(f => ({ ...f, wholesalePrice: e.target.value }))} />
-              <Input type="number" inputMode="numeric" step="1" placeholder="ขั้นต่ำ (ชิ้น)" value={form.minWholesaleQty ?? ""} onChange={e => setForm(f => ({ ...f, minWholesaleQty: e.target.value }))} />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <Input type="number" inputMode="decimal" step="any" placeholder="น้ำหนัก (กก.)" value={form.weightKg ?? ""} onChange={e => setForm(f => ({ ...f, weightKg: e.target.value }))} />
-            </div>
-            <div className="flex gap-3">
-              <Button onClick={handleSave} className="gradient-warm text-primary-foreground flex-1">บันทึก</Button>
-              <Button variant="outline" onClick={() => { setShowForm(false); setEditingId(null); setForm({ name: "", description: "", retailPrice: "", wholesalePrice: "", minWholesaleQty: "", weightKg: "", image: "", category: "" }); }} className="flex-1">ยกเลิก</Button>
-            </div>
-          </div>
-        )}
-
-        {/* Product list */}
-        <div className="space-y-3">
-          {products.slice().sort((a, b) => {
-            const ap = a.pinned ? 1 : 0; const bp = b.pinned ? 1 : 0;
-            if (ap !== bp) return bp - ap;
-            const at = a.pinnedAt ?? 0; const bt = b.pinnedAt ?? 0;
-            if (at !== bt) return bt - at;
-            return Number(b.id) - Number(a.id);
-          }).map(product => (
-            <div key={product.id} className="glass rounded-[var(--radius)] p-4 flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-                {product.image ? (
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs">ไม่มีรูป</div>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
-                  {product.pinned && <Badge className="text-xs shrink-0 gradient-warm text-primary-foreground border-0" variant="secondary">ขายดี</Badge>}
-                  {product.category && <Badge variant="secondary" className="text-xs shrink-0">{product.category}</Badge>}
-                </div>
-                <p className="text-sm text-muted-foreground">ปลีก ฿{product.retailPrice} | ส่ง ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})</p>
-              </div>
-              <Button variant="outline" onClick={() => handleTogglePin(product)} className="rounded-xl shrink-0" title={product.pinned ? "ถอนหมุด" : "ปักหมุด"}>
-                {product.pinned ? (<><PinOff className="w-4 h-4 mr-1" /> ถอนหมุด</>) : (<><Pin className="w-4 h-4 mr-1" /> ปักหมุด</>)}
-              </Button>
-              <Button variant="outline" onClick={() => startEdit(product)} className="rounded-xl shrink-0">แก้ไข</Button>
-              <button onClick={() => handleDelete(product.id)} className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors shrink-0">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
