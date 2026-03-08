@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { Settings, ShoppingCart, UserCircle, LogIn } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
+import ThemeToggle from "@/components/ThemeToggle";
+import BackToTop from "@/components/BackToTop";
 
 const CART_STORAGE_KEY_V2 = "sunny_cart_v2";
 
