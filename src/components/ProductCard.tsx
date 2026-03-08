@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/products";
-import { Flame, Package } from "lucide-react";
+import { Flame, Package, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
