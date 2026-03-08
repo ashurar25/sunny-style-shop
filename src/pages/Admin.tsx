@@ -228,7 +228,11 @@ const Admin = () => {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {activeTab === "orders" ? (
+        {activeTab === "dashboard" ? (
+          <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>}>
+            <AdminDashboard />
+          </Suspense>
+        ) : activeTab === "orders" ? (
           <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>}>
             <AdminOrders />
           </Suspense>
