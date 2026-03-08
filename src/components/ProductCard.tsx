@@ -93,6 +93,13 @@ const ProductCard = React.memo(function ProductCard({ product, index, enableAddT
             <Flame className="w-3 h-3 mr-1" /> ขายดี
           </Badge>
         )}
+        <button
+          onClick={handleShare}
+          className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+          title="แชร์สินค้า"
+        >
+          <Share2 className="w-4 h-4 text-foreground" />
+        </button>
       </div>
       
       <div className="p-4 space-y-2">
