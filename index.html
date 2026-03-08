@@ -1,46 +1,65 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
-    <title>กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป</title>
-    <meta name="description" content="ปอเปี๊ยะทอดกรอบ ไก่ทอดกรอบ กุ้งทอดกรอบ สดใหม่ทุกวัน สั่งซื้อง่ายผ่าน Line และ Facebook" />
+    <link rel="canonical" href="https://sunny-style-shop.vercel.app/" />
+    <title>กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป ราคาส่ง</title>
+    <meta name="description" content="กรุ๊งกริ๊ง ทอดกรอบ จำหน่ายปอเปี๊ยะทอด ไก่ทอด กุ้งทอด สดใหม่ทุกวัน ราคาปลีก-ส่ง สั่งง่ายผ่าน Line และ Facebook" />
     <meta name="author" content="กรุ๊งกริ๊ง ทอดกรอบ" />
+    <meta name="robots" content="index, follow" />
 
     <!-- Performance optimizations -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="//supabase.co" />
-    <link rel="dns-prefetch" href="//neon.tech" />
-    
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป ราคาส่ง" />
+    <meta property="og:description" content="จำหน่ายปอเปี๊ยะทอด ไก่ทอด กุ้งทอด สดใหม่ทุกวัน ราคาปลีก-ส่ง สั่งง่ายผ่าน Line และ Facebook" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="th_TH" />
+    <meta property="og:url" content="https://sunny-style-shop.vercel.app/" />
+    <meta property="og:image" content="https://sunny-style-shop.vercel.app/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="กรุ๊งกริ๊ง ทอดกรอบ" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป" />
+    <meta name="twitter:description" content="จำหน่ายปอเปี๊ยะทอด ไก่ทอด กุ้งทอด สดใหม่ทุกวัน สั่งง่ายผ่าน Line และ Facebook" />
+    <meta name="twitter:image" content="https://sunny-style-shop.vercel.app/og-image.jpg" />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "กรุ๊งกริ๊ง ทอดกรอบ",
+      "description": "จำหน่ายอาหารทอดกรอบ ปอเปี๊ยะทอด ไก่ทอด กุ้งทอด สดใหม่ทุกวัน ราคาปลีก-ส่ง",
+      "url": "https://sunny-style-shop.vercel.app",
+      "image": "https://sunny-style-shop.vercel.app/og-image.jpg",
+      "priceRange": "฿",
+      "@id": "https://sunny-style-shop.vercel.app/#business",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "TH"
+      },
+      "sameAs": []
+    }
+    </script>
+
     <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW registered: ', registration);
-            })
-            .catch((registrationError) => {
-              console.log('SW registration failed: ', registrationError);
-            });
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
         });
       }
     </script>
-
-    <!-- Open Graph tags -->
-    <meta property="og:title" content="กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป" />
-    <meta property="og:description" content="กรุ๊งกริ๊ง ทอดกรอบ — อาหารสด แปรรูป สดใหม่ทุกวัน สั่งซื้อง่ายผ่าน Line และ Facebook" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://sunny-style-shop.vercel.app" />
-    <meta property="og:image" content="https://sunny-style-shop.vercel.app/og-image.jpg" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@kenginol" />
-    <meta name="twitter:image" content="https://sunny-style-shop.vercel.app/og-image.jpg" />
   </head>
 
   <body>
