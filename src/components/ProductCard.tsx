@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/products";
-import { Flame, Package } from "lucide-react";
+import { Flame, Package, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -18,6 +18,24 @@ interface ProductCardProps {
 
 const ProductCard = React.memo(function ProductCard({ product, index, enableAddToCart = false, highPriorityImage = false }: ProductCardProps) {
   const { user } = useAuth();
+
+  const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `${product.name} ราคาปลีก ฿${product.retailPrice} | ราคาส่ง ฿${product.wholesalePrice}`,
+      url: window.location.origin,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+        toast.success("คัดลอกลิงก์แล้ว");
+      }
+    } catch {
+      // user cancelled
+    }
+  };
 
   const handleAddToCart = () => {
     if (!user) {
@@ -75,6 +93,13 @@ const ProductCard = React.memo(function ProductCard({ product, index, enableAddT
             <Flame className="w-3 h-3 mr-1" /> ขายดี
           </Badge>
         )}
+        <button
+          onClick={handleShare}
+          className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+          title="แชร์สินค้า"
+        >
+          <Share2 className="w-4 h-4 text-foreground" />
+        </button>
       </div>
       
       <div className="p-4 space-y-2">

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAdmin } from "@/hooks/useAdmin";
 
 const AdminOrders = lazy(() => import("@/components/AdminOrders"));
+const AdminDashboard = lazy(() => import("@/components/AdminDashboard"));
 
 const getErrorMessage = (e: unknown) => {
   if (e instanceof Error) return e.message;
@@ -20,7 +21,7 @@ const getErrorMessage = (e: unknown) => {
 
 const Admin = () => {
   const { isAdmin, loading: adminLoading, user } = useAdmin();
-  const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "products" | "orders">("dashboard");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -206,6 +207,12 @@ const Admin = () => {
         {/* Tabs */}
         <div className="max-w-4xl mx-auto px-4 flex gap-1 pb-2">
           <button
+            onClick={() => setActiveTab("dashboard")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === "dashboard" ? "gradient-warm text-primary-foreground shadow-warm" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            แดชบอร์ด
+          </button>
+          <button
             onClick={() => setActiveTab("products")}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === "products" ? "gradient-warm text-primary-foreground shadow-warm" : "text-muted-foreground hover:bg-muted"}`}
           >
@@ -221,7 +228,11 @@ const Admin = () => {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {activeTab === "orders" ? (
+        {activeTab === "dashboard" ? (
+          <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>}>
+            <AdminDashboard />
+          </Suspense>
+        ) : activeTab === "orders" ? (
           <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>}>
             <AdminOrders />
           </Suspense>

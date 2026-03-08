@@ -5,6 +5,7 @@ import ProductCardSkeleton from "./ProductCardSkeleton";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -122,11 +123,13 @@ const ProductGrid = () => {
       )}
 
       {/* Search */}
-      <div className="max-w-xl mx-auto mb-6">
+      <div className="max-w-xl mx-auto mb-6 relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="ค้นหาสินค้า..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          className="pl-10 rounded-xl"
         />
       </div>
 
