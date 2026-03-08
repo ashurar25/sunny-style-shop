@@ -190,16 +190,33 @@ const Admin = () => {
             <Link to="/" className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </Link>
-            <h1 className="text-xl font-bold text-foreground">จัดการสินค้า</h1>
+            <h1 className="text-xl font-bold text-foreground">แอดมิน</h1>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowCategoryForm(!showCategoryForm)} className="rounded-full">
-              <Tag className="w-4 h-4 mr-1" /> หมวดหมู่
-            </Button>
-            <Button onClick={() => setShowForm(!showForm)} className="gradient-warm text-primary-foreground rounded-full shadow-warm">
-              <Plus className="w-4 h-4 mr-1" /> เพิ่มสินค้า
-            </Button>
-          </div>
+          {activeTab === "products" && (
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowCategoryForm(!showCategoryForm)} className="rounded-full">
+                <Tag className="w-4 h-4 mr-1" /> หมวดหมู่
+              </Button>
+              <Button onClick={() => setShowForm(!showForm)} className="gradient-warm text-primary-foreground rounded-full shadow-warm">
+                <Plus className="w-4 h-4 mr-1" /> เพิ่มสินค้า
+              </Button>
+            </div>
+          )}
+        </div>
+        {/* Tabs */}
+        <div className="max-w-4xl mx-auto px-4 flex gap-1 pb-2">
+          <button
+            onClick={() => setActiveTab("products")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === "products" ? "gradient-warm text-primary-foreground shadow-warm" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            สินค้า
+          </button>
+          <button
+            onClick={() => setActiveTab("orders")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab === "orders" ? "gradient-warm text-primary-foreground shadow-warm" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            <Package className="w-4 h-4" /> ออเดอร์
+          </button>
         </div>
       </header>
 
