@@ -19,6 +19,24 @@ interface ProductCardProps {
 const ProductCard = React.memo(function ProductCard({ product, index, enableAddToCart = false, highPriorityImage = false }: ProductCardProps) {
   const { user } = useAuth();
 
+  const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `${product.name} ราคาปลีก ฿${product.retailPrice} | ราคาส่ง ฿${product.wholesalePrice}`,
+      url: window.location.origin,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+        toast.success("คัดลอกลิงก์แล้ว");
+      }
+    } catch {
+      // user cancelled
+    }
+  };
+
   const handleAddToCart = () => {
     if (!user) {
       toast.error("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้า");
