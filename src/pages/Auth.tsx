@@ -62,31 +62,6 @@ const Auth = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin,
-          skipBrowserRedirect: true,
-        },
-      });
-      if (error) throw error;
-      if (data?.url) {
-        const oauthUrl = new URL(data.url);
-        const allowedHosts = ["accounts.google.com", "enqdjtlxzvsztzpetdpw.supabase.co"];
-        if (!allowedHosts.some((host) => oauthUrl.hostname === host)) {
-          throw new Error("Invalid OAuth redirect URL");
-        }
-        window.location.href = data.url;
-      }
-    } catch {
-      toast.error("เกิดข้อผิดพลาด");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
