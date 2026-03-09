@@ -289,12 +289,7 @@ const Order = () => {
 
   const getTotal = () => {
     return cart.reduce(
-      (sum, item) =>
-        sum +
-        (item.quantity >= item.minWholesaleQty
-          ? item.wholesalePrice
-          : item.retailPrice) *
-          item.quantity,
+      (sum, item) => sum + item.retailPrice * item.quantity,
       0
     );
   };
@@ -325,13 +320,10 @@ const Order = () => {
     const items = cart
       .map(
         (item) => {
-          const price = item.quantity >= item.minWholesaleQty
-            ? item.wholesalePrice
-            : item.retailPrice;
           const weightNote = item.weightKg && Number(item.weightKg) > 0
             ? ` (น้ำหนัก ${item.weightKg} กก./แพ็ค)`
             : '';
-          return `${item.name} x${item.quantity} = ฿${price}/ชิ้น${weightNote}`;
+          return `${item.name} x${item.quantity} = ฿${item.retailPrice}/ชิ้น${weightNote}`;
         }
       )
       .join("\n");
@@ -406,8 +398,7 @@ const Order = () => {
     let y = 200;
     ctx.font = "12px Arial";
     cart.forEach((item) => {
-      const price = item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice;
-      const total = price * item.quantity;
+      const total = item.retailPrice * item.quantity;
       
       ctx.fillText(`${item.name}`, 40, y);
       ctx.fillText(`x${item.quantity}`, 250, y);
@@ -598,7 +589,7 @@ const Order = () => {
       items: cart.map((i) => ({
         name: i.name,
         quantity: i.quantity,
-        price: i.quantity >= i.minWholesaleQty ? i.wholesalePrice : i.retailPrice,
+        price: i.retailPrice,
       })) as any,
       subtotal: subTotal,
       shipping_fee: ship.shippingFee,
@@ -705,10 +696,7 @@ const Order = () => {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      ฿{item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice}/ชิ้น
-                      {item.quantity < item.minWholesaleQty && (
-                        <span className="text-xs text-primary ml-1">(ขั้นต่ำ {item.minWholesaleQty} ชิ้น ราคาส่ง)</span>
-                      )}
+                      ฿{item.retailPrice}/ชิ้น
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
