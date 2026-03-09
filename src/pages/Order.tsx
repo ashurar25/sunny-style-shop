@@ -696,10 +696,7 @@ const Order = () => {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      ฿{item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice}/ชิ้น
-                      {item.quantity < item.minWholesaleQty && (
-                        <span className="text-xs text-primary ml-1">(ขั้นต่ำ {item.minWholesaleQty} ชิ้น ราคาส่ง)</span>
-                      )}
+                      ฿{item.retailPrice}/ชิ้น
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
