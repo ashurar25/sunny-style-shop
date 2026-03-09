@@ -114,16 +114,10 @@ const ProductCard = React.memo(function ProductCard({ product, index, enableAddT
           </div>
         )}
         
-        <div className="space-y-1.5 pt-0.5">
+        <div className="pt-0.5">
           <div className="flex items-baseline justify-between">
-            <span className="text-xs text-muted-foreground">ราคาปลีก</span>
+            <span className="text-xs text-muted-foreground">ราคา</span>
             <span className="text-xl font-extrabold text-primary">฿{product.retailPrice}</span>
-          </div>
-          <div className="flex items-center justify-between bg-secondary/30 rounded-lg px-3 py-2 border border-secondary/20">
-            <span className="text-[11px] text-muted-foreground">
-              ส่ง ขั้นต่ำ {product.minWholesaleQty} ชิ้น
-            </span>
-            <span className="text-base font-bold text-accent-foreground">฿{product.wholesalePrice}</span>
           </div>
         </div>
 
