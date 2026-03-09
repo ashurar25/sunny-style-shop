@@ -398,8 +398,7 @@ const Order = () => {
     let y = 200;
     ctx.font = "12px Arial";
     cart.forEach((item) => {
-      const price = item.quantity >= item.minWholesaleQty ? item.wholesalePrice : item.retailPrice;
-      const total = price * item.quantity;
+      const total = item.retailPrice * item.quantity;
       
       ctx.fillText(`${item.name}`, 40, y);
       ctx.fillText(`x${item.quantity}`, 250, y);
