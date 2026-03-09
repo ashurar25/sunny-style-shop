@@ -22,7 +22,7 @@ const ProductCard = React.memo(function ProductCard({ product, index, enableAddT
   const handleShare = async () => {
     const shareData = {
       title: product.name,
-      text: `${product.name} ราคาปลีก ฿${product.retailPrice} | ราคาส่ง ฿${product.wholesalePrice}`,
+      text: `${product.name} ราคา ฿${product.retailPrice}`,
       url: window.location.origin,
     };
     try {
