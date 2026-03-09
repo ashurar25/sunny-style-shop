@@ -589,7 +589,7 @@ const Order = () => {
       items: cart.map((i) => ({
         name: i.name,
         quantity: i.quantity,
-        price: i.quantity >= i.minWholesaleQty ? i.wholesalePrice : i.retailPrice,
+        price: i.retailPrice,
       })) as any,
       subtotal: subTotal,
       shipping_fee: ship.shippingFee,
