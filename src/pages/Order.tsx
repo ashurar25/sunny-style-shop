@@ -289,12 +289,7 @@ const Order = () => {
 
   const getTotal = () => {
     return cart.reduce(
-      (sum, item) =>
-        sum +
-        (item.quantity >= item.minWholesaleQty
-          ? item.wholesalePrice
-          : item.retailPrice) *
-          item.quantity,
+      (sum, item) => sum + item.retailPrice * item.quantity,
       0
     );
   };
