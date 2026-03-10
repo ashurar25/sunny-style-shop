@@ -275,7 +275,6 @@ const Admin = () => {
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                 <Input placeholder="ชื่อสินค้า" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-                <Textarea placeholder="รายละเอียด (ไม่จำเป็น)" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} />
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">หมวดหมู่</label>
                   <div className="flex flex-wrap gap-2">
