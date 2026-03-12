@@ -331,7 +331,17 @@ const Order = () => {
     const subTotal = getTotal();
     const ship = getShippingAndPackaging();
     const grandTotal = subTotal + ship.extraFee;
-    const summary = `📋 รายการสั่งซื้อ\n${items}\n\n⚖️ น้ำหนักรวม: ${formatKg(ship.totalWeightKg)}\n� ${ship.foamBoxLabel}: ${formatTHB(ship.foamBoxFee)}\n🚚 ค่าส่ง: ${formatTHB(ship.shippingFee)}\n\n� ยอดรวมสินค้า: ${formatTHB(subTotal)}\n✅ ยอดรวมสุทธิ: ${formatTHB(grandTotal)}\n\n👤 ข้อมูลผู้สั่ง\nชื่อ: ${customerInfo.name}\nเบอร์โทร: ${customerInfo.phone}\nที่อยู่: ${customerInfo.address}\nหมายเหตุ: ${customerInfo.note}`;
+    
+    // หมายเหตุออกจากร้าน
+    const shopNote = `📦 หมายเหตุจากร้าน:
+- สินค้าสดใหม่ทุกวัน  
+- แพ็คสินค้าป้องกันการกระแทก
+- ส่งเร็วภายใน 24 ชั่วโมง
+- ตรวจสอบสินค้าก่อนรับ
+- ไม่รับคืนสินค้าที่สั่งไปแล้ว
+- หากสินค้าชำรุด/เสียหาย ต้องแจ้งภายใน 24 ชั่วโมง`;
+    
+    const summary = `📋 รายการสั่งซื้อ\n${items}\n\n⚖️ น้ำหนักรวม: ${formatKg(ship.totalWeightKg)}\n� ${ship.foamBoxLabel}: ${formatTHB(ship.foamBoxFee)}\n🚚 ค่าส่ง: ${formatTHB(ship.shippingFee)}\n\n� ยอดรวมสินค้า: ${formatTHB(subTotal)}\n✅ ยอดรวมสุทธิ: ${formatTHB(grandTotal)}\n\n${shopNote}\n\n👤 ข้อมูลผู้สั่ง\nชื่อ: ${customerInfo.name}\nเบอร์โทร: ${customerInfo.phone}\nที่อยู่: ${customerInfo.address}\nหมายเหตุ: ${customerInfo.note}`;
 
     return summary;
   };

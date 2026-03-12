@@ -288,7 +288,7 @@ const Admin = () => {
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <Input type="number" inputMode="decimal" step="any" placeholder="ราคาปลีก" value={form.retailPrice ?? ""} onChange={e => setForm(f => ({ ...f, retailPrice: e.target.value }))} />
-                  <Input type="number" inputMode="decimal" step="any" placeholder="ราคาส่ง" value={form.wholesalePrice ?? ""} onChange={e => setForm(f => ({ ...f, wholesalePrice: e.target.value }))} />
+                  <Input type="number" inputMode="decimal" step="any" placeholder="ราคาขายแค่ปลีก" value={form.wholesalePrice ?? ""} onChange={e => setForm(f => ({ ...f, wholesalePrice: e.target.value }))} />
                   <Input type="number" inputMode="numeric" step="1" placeholder="ขั้นต่ำ (ชิ้น)" value={form.minWholesaleQty ?? ""} onChange={e => setForm(f => ({ ...f, minWholesaleQty: e.target.value }))} />
                 </div>
                 <div className="grid grid-cols-3 gap-3">
@@ -324,7 +324,7 @@ const Admin = () => {
                       {product.pinned && <Badge className="text-xs shrink-0 gradient-warm text-primary-foreground border-0" variant="secondary">ขายดี</Badge>}
                       {product.category && <Badge variant="secondary" className="text-xs shrink-0">{product.category}</Badge>}
                     </div>
-                    <p className="text-sm text-muted-foreground">ปลีก ฿{product.retailPrice} | ส่ง ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})</p>
+                    <p className="text-sm text-muted-foreground">ปลีก ฿{product.retailPrice} | ขายแค่ปลีก ฿{product.wholesalePrice} (ขั้นต่ำ {product.minWholesaleQty})</p>
                   </div>
                   <Button variant="outline" onClick={() => handleTogglePin(product)} className="rounded-xl shrink-0" title={product.pinned ? "ถอนหมุด" : "ปักหมุด"}>
                     {product.pinned ? (<><PinOff className="w-4 h-4 mr-1" /> ถอนหมุด</>) : (<><Pin className="w-4 h-4 mr-1" /> ปักหมุด</>)}
