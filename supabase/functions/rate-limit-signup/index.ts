@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const MAX_SIGNUPS_PER_HOUR = 3;
+const MAX_SIGNUPS_PER_HOUR = 1; // จำกัด 1 ครั้งต่อ IP ต่อชั่วโมง
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
 
     if ((count ?? 0) >= MAX_SIGNUPS_PER_HOUR) {
       return new Response(
-        JSON.stringify({ error: "สมัครได้สูงสุด 3 ครั้งต่อชั่วโมง กรุณาลองใหม่ภายหลัง" }),
+        JSON.stringify({ error: "สมัครได้สูงสุด 1 ครั้งต่อชั่วโมง กรุณาลองใหม่ภายหลัง" }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: false,
+      email_confirm: false, // ปิด email confirmation
     });
 
     if (error) {

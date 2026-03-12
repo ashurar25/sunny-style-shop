@@ -62,7 +62,7 @@ const Auth = () => {
         await supabase.from("profiles").update({ full_name: name }).eq("id", res.data.user.id);
       }
 
-      toast.success("สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีของคุณ");
+      toast.success("สมัครสมาชิกสำเร็จ! สามารถเข้าสู่ระบบได้ทันที");
       setEmail("");
       setPassword("");
       setName("");
