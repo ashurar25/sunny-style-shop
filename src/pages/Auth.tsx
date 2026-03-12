@@ -57,17 +57,16 @@ const Auth = () => {
       if (res.error || res.data?.error) {
         throw new Error(res.data?.error || res.error?.message || "เกิดข้อผิดพลาด");
       }
-      // Auto login after signup
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-
       // Update profile name if provided
       if (name && res.data?.user?.id) {
         await supabase.from("profiles").update({ full_name: name }).eq("id", res.data.user.id);
       }
 
-      toast.success("สมัครสมาชิกสำเร็จ!");
-      navigate("/");
+      toast.success("สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีของคุณ");
+      setEmail("");
+      setPassword("");
+      setName("");
+      setIsLogin(true);
     } catch (err: any) {
       toast.error(err.message || "เกิดข้อผิดพลาด");
     } finally {
